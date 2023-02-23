@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { Container, Form } from "react-bootstrap";
+import axios from "axios";
+
 import useAuth from "./useAuth.jsx";
 import TrackSearchResults from "./TrackSearchResults.jsx";
 import Player from "./Player.jsx";
-import { Container, Form } from "react-bootstrap";
 import SpotifyWebApi from "spotify-web-api-node";
 
 const spotifyApi = new SpotifyWebApi({
@@ -14,11 +16,28 @@ export default function Dashboard({ code }) {
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [playingTrack, setPlayingTrack] = useState();
+  const [lyrics, setLyrics] = useState("");
 
   function chooseTrack(track) {
     setPlayingTrack(track);
     setSearch("");
+    setLyrics("");
   }
+
+  useEffect(() => {
+    if (!playingTrack) return;
+
+    axios
+      .get("http://localhost:3001/lyrics", {
+        params: {
+          track: playingTrack.title,
+          artists: playingTrack.artists,
+        },
+      })
+      .then((res) => {
+        setLyrics(res.data.lyrics);
+      });
+  }, [playingTrack]);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -70,6 +89,11 @@ export default function Dashboard({ code }) {
             chooseTrack={chooseTrack}
           />
         ))}
+        {searchResults.length === 0 && (
+          <div className="text-center" style={{ whiteSpace: "pre" }}>
+            {lyrics}
+          </div>
+        )}
       </div>
       <div>
         <Player accessToken={accessToken} trackUri={playingTrack?.uri} />
