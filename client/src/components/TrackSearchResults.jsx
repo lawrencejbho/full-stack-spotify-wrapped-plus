@@ -1,8 +1,14 @@
 import React from "react";
 
-export default function TrackSearchResults({ track, chooseTrack }) {
+export default function TrackSearchResults({
+  track,
+  chooseTrack,
+  clearSearch,
+}) {
+  // update the track in Dashboard and clear search results in Search
   function handlePlay() {
     chooseTrack(track);
+    clearSearch({ artists: track.artists, title: track.title });
   }
   return (
     <div

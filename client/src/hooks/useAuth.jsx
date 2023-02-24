@@ -6,7 +6,6 @@ export default function useAuth(code) {
   const [refreshToken, setRefreshToken] = useState();
   const [expiresIn, setExpiresIn] = useState();
 
-  console.log(code);
   useEffect(() => {
     axios
       .post("http://localhost:3001/api/login", {
@@ -41,6 +40,6 @@ export default function useAuth(code) {
     return () => clearInterval(interval);
   }, [refreshToken, expiresIn]);
 
-  console.log(accessToken);
+  // console.log(accessToken);
   return accessToken;
 }

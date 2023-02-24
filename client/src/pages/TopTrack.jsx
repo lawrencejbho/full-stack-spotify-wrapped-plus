@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from "react";
 import TopEntry from "../components/TopEntry.jsx";
+import { useOutletContext } from "react-router-dom";
+import SpotifyWebApi from "spotify-web-api-node";
+
+const spotifyApi = new SpotifyWebApi({
+  clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
+});
 
 export default function TopTrack({ accessToken }) {
+  const location = useOutletContext();
+  const [topTracks, setTopTracks] = useState([]);
+
+  useEffect(() => {
+    if (!location.accessToken) return;
+    spotifyApi.setAccessToken(location.accessToken);
+  }, [location.accessToken]);
+
   // need to update the scope to get top
   useEffect(() => {
-    if (!accessToken) return;
+    if (!location.accessToken) return;
 
     spotifyApi.getMyTopTracks({ time_range: "short_term" }).then((data) => {
       // console.log(data.body.items);
@@ -35,20 +49,21 @@ export default function TopTrack({ accessToken }) {
         })
       );
     });
-  }, [accessToken]);
+  }, [location.accessToken]);
 
   return (
     <div>
       {topTracks.length > 0 ? (
         <div className="text-center" style={{ whiteSpace: "pre" }}>
-          {topTracks.map((track) => {
+          {topTracks.map((track, index) => {
             return (
               <TopEntry
                 track={track}
                 name={track.name}
                 artist={track.artist}
                 albumUrl={track.albumUrl}
-                chooseTrack={chooseTrack}
+                chooseTrack={location.chooseTrack}
+                key={index}
               />
             );
           })}

@@ -1,5 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+import App from "./App";
+import Search from "./pages/Search.jsx";
+import TopTrack from "./pages/TopTrack.jsx";
+import TopArtist from "./pages/TopArtist.jsx";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "search",
+        element: <Search />,
+      },
+      {
+        path: "top-artists",
+        element: <TopArtist />,
+      },
+      {
+        path: "top-tracks",
+        element: <TopTrack />,
+      },
+    ],
+  },
+]);
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <RouterProvider router={router} />
+);

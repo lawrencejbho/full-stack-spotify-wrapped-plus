@@ -1,21 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const AUTH_URL =
-  "https://accounts.spotify.com/authorize?client_id=501daf7d1dfb43a291ccc64c91c8a4c8&response_type=code&redirect_uri=http://localhost:5173/dashboard/&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read";
+  "https://accounts.spotify.com/authorize?client_id=501daf7d1dfb43a291ccc64c91c8a4c8&response_type=code&redirect_uri=http://localhost:5173&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read";
 
 export default function Login() {
-  const code = new URLSearchParams(window.location.search).get("code");
-
-  const navigate = useNavigate();
-  console.log(code);
-
-  useEffect(() => {
-    if (!code) return;
-
-    navigate("/dashboard", { state: code });
-  }, [code]);
-
   return (
     <section className="flex min-h-screen w-full items-center justify-center bg-gray-200">
       <a className="" href={AUTH_URL}>

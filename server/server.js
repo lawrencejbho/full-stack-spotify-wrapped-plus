@@ -13,7 +13,7 @@ app.post("/api/refresh", (req, res) => {
   console.log(req);
   const refreshToken = req.body.refreshToken;
   const spotifyApi = new SpotifyWebApi({
-    redirectUri: "http://localhost:5173/dashboard/",
+    redirectUri: "http://localhost:5173",
     clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
     clientSecret: "9aa707866a144a66955d05e169c16214",
     refreshToken,
@@ -33,7 +33,7 @@ app.post("/api/login", (req, res) => {
   console.log(req);
   const code = req.body.code;
   const spotifyApi = new SpotifyWebApi({
-    redirectUri: "http://localhost:5173/dashboard/",
+    redirectUri: "http://localhost:5173",
     clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
     clientSecret: "9aa707866a144a66955d05e169c16214",
   });
@@ -55,6 +55,7 @@ app.post("/api/login", (req, res) => {
 
 // need url encoded to parse the url params in get request
 app.get("/api/lyrics", async (req, res) => {
+  console.log(req);
   const lyrics =
     (await lyricsFinder(req.query.artists, req.query.track)) ||
     "No Lyrics Found";
