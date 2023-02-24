@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import TopEntry from "../components/TopEntry.jsx";
 
 export default function TopTrack({ accessToken }) {
   // need to update the scope to get top

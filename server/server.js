@@ -9,10 +9,11 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/refresh", (req, res) => {
+app.post("/api/refresh", (req, res) => {
+  console.log(req);
   const refreshToken = req.body.refreshToken;
   const spotifyApi = new SpotifyWebApi({
-    redirectUri: "http://localhost:5173",
+    redirectUri: "http://localhost:5173/dashboard/",
     clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
     clientSecret: "9aa707866a144a66955d05e169c16214",
     refreshToken,
@@ -21,17 +22,18 @@ app.post("/refresh", (req, res) => {
   spotifyApi
     .refreshAccessToken()
     .then((data) => {
-      // console.log(data.body);
+      console.log(data.body);
     })
     .catch(() => {
       res.sendStatus(400);
     });
 });
 
-app.post("/login", (req, res) => {
+app.post("/api/login", (req, res) => {
+  console.log(req);
   const code = req.body.code;
   const spotifyApi = new SpotifyWebApi({
-    redirectUri: "http://localhost:5173",
+    redirectUri: "http://localhost:5173/dashboard/",
     clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
     clientSecret: "9aa707866a144a66955d05e169c16214",
   });
@@ -52,7 +54,7 @@ app.post("/login", (req, res) => {
 });
 
 // need url encoded to parse the url params in get request
-app.get("/lyrics", async (req, res) => {
+app.get("/api/lyrics", async (req, res) => {
   const lyrics =
     (await lyricsFinder(req.query.artists, req.query.track)) ||
     "No Lyrics Found";
