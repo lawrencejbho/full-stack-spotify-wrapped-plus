@@ -6,6 +6,7 @@ import useAuth from "./useAuth.jsx";
 import TrackSearchResults from "./TrackSearchResults.jsx";
 import Player from "./Player.jsx";
 import SpotifyWebApi from "spotify-web-api-node";
+import Top from "./Top.jsx";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
@@ -17,6 +18,8 @@ export default function Dashboard({ code }) {
   const [searchResults, setSearchResults] = useState([]);
   const [playingTrack, setPlayingTrack] = useState();
   const [lyrics, setLyrics] = useState("");
+  const [topArtists, setTopArtists] = useState([]);
+  const [topTracks, setTopTracks] = useState([]);
 
   function chooseTrack(track) {
     setPlayingTrack(track);
@@ -73,6 +76,54 @@ export default function Dashboard({ code }) {
     return () => (cancel = true);
   }, [search, accessToken]);
 
+  // need to update the scope to get top
+  useEffect(() => {
+    if (!accessToken) return;
+    spotifyApi.getMyTopArtists().then((data) => {
+      // console.log(data.body.items);
+      setTopArtists(
+        data.body.items.map((artist) => {
+          return {
+            name: artist.name,
+          };
+        })
+      );
+    });
+
+    spotifyApi.getMyTopTracks({ time_range: "short_term" }).then((data) => {
+      // console.log(data.body.items);
+      setTopTracks(
+        data.body.items.map((track) => {
+          const smallestAlbumImage = track.album.images.reduce(
+            (smallest, image) => {
+              if (image.height < smallest.height) return image;
+              return smallest;
+            },
+            track.album.images[0]
+          );
+          let artists_string = "";
+          track.artists.forEach((artist, index) => {
+            if (index + 1 == track.artists.length) {
+              return (artists_string += `${artist.name}`);
+            } else {
+              return (artists_string += `${artist.name}, `);
+            }
+          });
+
+          return {
+            artist: artists_string,
+            name: track.name,
+            uri: track.uri,
+
+            albumUrl: smallestAlbumImage.url,
+          };
+        })
+      );
+    });
+  }, [accessToken]);
+
+  console.log(topTracks);
+
   return (
     <Container className="d-flex flex-column py-2" style={{ height: "100vh" }}>
       <Form.Control
@@ -95,6 +146,29 @@ export default function Dashboard({ code }) {
           </div>
         )}
       </div>
+      {/* {topArtists.length > 0 ? (
+        <div className="text-center" style={{ whiteSpace: "pre" }}>
+          {topArtists.map((artist) => {
+            return <div>{artist.name}</div>;
+          })}
+        </div>
+      ) : null} */}
+      {topTracks.length > 0 ? (
+        <div className="text-center" style={{ whiteSpace: "pre" }}>
+          {topTracks.map((track) => {
+            return (
+              <Top
+                track={track}
+                name={track.name}
+                artist={track.artist}
+                albumUrl={track.albumUrl}
+                chooseTrack={chooseTrack}
+              />
+            );
+          })}
+        </div>
+      ) : null}
+
       <div>
         <Player accessToken={accessToken} trackUri={playingTrack?.uri} />
       </div>
