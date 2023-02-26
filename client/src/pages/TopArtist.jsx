@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import SpotifyWebApi from "spotify-web-api-node";
 
 import TimeSelectNav from "../components/TimeSelectNav.jsx";
+import ArtistEntry from "../components/ArtistEntry.jsx";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
@@ -53,8 +54,6 @@ export default function TopArtist({ accessToken }) {
   }, [location.accessToken, timeSelect]);
 
   function changeTime(duration) {
-    console.log("hit");
-    console.log(duration);
     setTimeSelect(duration);
   }
 
@@ -66,23 +65,12 @@ export default function TopArtist({ accessToken }) {
         <div className="mt-12" style={{ whiteSpace: "pre" }}>
           {topArtists.map((artist, index) => {
             return (
-              <div className="flex m-4 space-x-6" key={index}>
-                <div className="flex justify-center items-center min-w-[20px]">
-                  {index + 1}
-                </div>
-                <img
-                  src={artist.albumUrl}
-                  className="rounded-md w-[50px] h-[64px] object-cover"
-                />
-                <div className="justify-start items-start">
-                  <div className="font-bold items-start justify-start text-start">
-                    {artist.name}
-                  </div>
-                  <div className="font-light text-sm justify-start text-start text-gray-500">
-                    {artist.genres}
-                  </div>
-                </div>
-              </div>
+              <ArtistEntry
+                albumUrl={artist.albumUrl}
+                name={artist.name}
+                genres={artist.genres}
+                index={index + 1}
+              />
             );
           })}
         </div>

@@ -31,7 +31,7 @@ export default function Dashboard({ code }) {
 
   return (
     <section className="h-screen font-Rubik">
-      <div className="flex h-[90%]">
+      <div className="flex h-[89%]">
         {accessToken ? (
           <SideBar
             accessToken={accessToken}
@@ -40,7 +40,7 @@ export default function Dashboard({ code }) {
           />
         ) : null}
 
-        <div className="pt-4 w-auto flex-grow h-[90%] items-center justify-center overflow-y-scroll">
+        <div className="pt-4 w-auto flex-grow h-full items-center justify-center overflow-y-scroll">
           <Outlet
             context={{ accessToken: accessToken, chooseTrack: chooseTrack }}
           />

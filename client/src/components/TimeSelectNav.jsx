@@ -3,7 +3,7 @@ import TimeSelectItem from "./TimeSelectItem.jsx";
 
 export default function TimeSelect({ timeSelect, handleClick }) {
   return (
-    <div className="flex space-x-8 mt-4 ml-5 font-bold underline-offset-[6px] ">
+    <div className="flex space-x-8 mt-4 pl-5 font-bold underline-offset-[6px] ">
       <TimeSelectItem
         timeSelect={timeSelect}
         duration="long_term"

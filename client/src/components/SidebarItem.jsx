@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 
-export default function TimeSelectItem({
-  timeSelect,
+export default function SidebarItem({
+  image,
+  accessToken,
+  pathname,
   handleClick,
-  duration,
+  page,
   display,
 }) {
   const [mouseHover, setMouseHover] = useState(false);
@@ -17,10 +20,10 @@ export default function TimeSelectItem({
   }
 
   function styles() {
-    if (timeSelect == duration) {
+    if (page == pathname) {
       return {
         opacity: 1,
-        textDecorationLine: "underline",
+        fontWeight: "bold",
       };
     }
     return {
@@ -29,14 +32,16 @@ export default function TimeSelectItem({
   }
 
   return (
-    <div
-      onClick={() => handleClick(duration)}
-      className="cursor-pointer flex  text-center"
+    <NavLink
+      to={{ pathname: `/${pathname}`, accessToken: accessToken }}
+      className="flex flex-col items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100"
       style={styles()}
+      onClick={() => handleClick(pathname)}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
     >
-      {display}
-    </div>
+      <img src={image} className="w-8" />
+      <span>{display}</span>
+    </NavLink>
   );
 }

@@ -61,9 +61,9 @@ export default function TopTrack({ accessToken }) {
 
   return (
     <div>
-      <TimeSelectNav handleClick={changeTime} />
+      <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
       {topTracks.length > 0 ? (
-        <div className="text-center" style={{ whiteSpace: "pre" }}>
+        <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
           {topTracks.map((track, index) => {
             return (
               <TrackEntry
@@ -73,6 +73,7 @@ export default function TopTrack({ accessToken }) {
                 albumUrl={track.albumUrl}
                 chooseTrack={location.chooseTrack}
                 key={index}
+                index={index + 1}
               />
             );
           })}
