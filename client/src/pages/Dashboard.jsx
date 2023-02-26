@@ -13,7 +13,7 @@ const spotifyApi = new SpotifyWebApi({
 
 export default function Dashboard({ code }) {
   const [playingTrack, setPlayingTrack] = useState();
-  const [page, setPage] = useState("search");
+  const [page, setPage] = useState("top-artists");
   const accessToken = useAuth(code);
 
   // console.log(code);
@@ -30,13 +30,21 @@ export default function Dashboard({ code }) {
   // console.log(accessToken);
 
   return (
-    <section className="h-screen">
-      {accessToken ? <SideBar accessToken={accessToken} /> : null}
+    <section className="h-screen font-Rubik">
+      <div className="flex h-[90%]">
+        {accessToken ? (
+          <SideBar
+            accessToken={accessToken}
+            page={page}
+            handleClick={choosePage}
+          />
+        ) : null}
 
-      <div className="pt-4 flex-grow h-[85%] items-center justify-center">
-        <Outlet
-          context={{ accessToken: accessToken, chooseTrack: chooseTrack }}
-        />
+        <div className="pt-4 w-auto flex-grow h-[90%] items-center justify-center overflow-y-scroll">
+          <Outlet
+            context={{ accessToken: accessToken, chooseTrack: chooseTrack }}
+          />
+        </div>
       </div>
 
       <footer className="sticky bottom-0">

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import TopEntry from "../components/TopEntry.jsx";
 import { useOutletContext } from "react-router-dom";
 import SpotifyWebApi from "spotify-web-api-node";
+
+import TrackEntry from "../components/TrackEntry.jsx";
+import TimeSelectNav from "../components/TimeSelectNav.jsx";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
@@ -10,6 +12,7 @@ const spotifyApi = new SpotifyWebApi({
 export default function TopTrack({ accessToken }) {
   const location = useOutletContext();
   const [topTracks, setTopTracks] = useState([]);
+  const [timeSelect, setTimeSelect] = useState("long_term");
 
   useEffect(() => {
     if (!location.accessToken) return;
@@ -20,7 +23,7 @@ export default function TopTrack({ accessToken }) {
   useEffect(() => {
     if (!location.accessToken) return;
 
-    spotifyApi.getMyTopTracks({ time_range: "short_term" }).then((data) => {
+    spotifyApi.getMyTopTracks({ time_range: timeSelect }).then((data) => {
       // console.log(data.body.items);
       setTopTracks(
         data.body.items.map((track) => {
@@ -49,15 +52,21 @@ export default function TopTrack({ accessToken }) {
         })
       );
     });
-  }, [location.accessToken]);
+  }, [location.accessToken, timeSelect]);
+
+  function changeTime(duration) {
+    console.log("hit");
+    setTimeSelect(duration);
+  }
 
   return (
     <div>
+      <TimeSelectNav handleClick={changeTime} />
       {topTracks.length > 0 ? (
         <div className="text-center" style={{ whiteSpace: "pre" }}>
           {topTracks.map((track, index) => {
             return (
-              <TopEntry
+              <TrackEntry
                 track={track}
                 name={track.name}
                 artist={track.artist}
