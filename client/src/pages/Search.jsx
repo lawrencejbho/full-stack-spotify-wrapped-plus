@@ -114,7 +114,7 @@ export default function Search() {
     if (!playingTrack) return;
 
     axios
-      .get("http://localhost:3001/api/lyrics", {
+      .get("/api/lyrics", {
         params: {
           track: playingTrack.title,
           artists: playingTrack.artists,

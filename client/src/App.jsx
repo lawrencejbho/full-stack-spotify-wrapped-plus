@@ -7,6 +7,7 @@ import {
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import "./index.css";
+import * as dotenv from "dotenv";
 
 const code = new URLSearchParams(window.location.search).get("code");
 

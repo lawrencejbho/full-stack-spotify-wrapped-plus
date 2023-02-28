@@ -10,4 +10,16 @@ export default defineConfig({
       plugins: [tailwindcss],
     },
   },
+  server: {
+    host: true,
+    port: 5173,
+    proxy: {
+      "/api": {
+        // target: "http://localhost:3001",
+        target: "http://www.wrappedplus.com",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });
