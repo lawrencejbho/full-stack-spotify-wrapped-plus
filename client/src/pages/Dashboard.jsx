@@ -16,6 +16,10 @@ export default function Dashboard({ code }) {
   const [page, setPage] = useState("top-artists");
   const accessToken = useAuth(code);
 
+  const [scrollTop, setScrollTop] = useState(0);
+  const [offsetHeight, setOffsetHeight] = useState(900);
+  const [clientHeight, setClientHeight] = useState(0);
+
   // console.log(code);
 
   function choosePage(page) {
@@ -24,10 +28,12 @@ export default function Dashboard({ code }) {
 
   function chooseTrack(track) {
     setPlayingTrack(track);
-    // setLyrics("");
   }
 
-  // console.log(accessToken);
+  // grab the scroll positioning in the parent and then it's easier to utilize later on
+  function handleScroll(event) {
+    setScrollTop(event.currentTarget.scrollTop);
+  }
 
   return (
     <section className="h-screen font-Rubik">
@@ -40,9 +46,18 @@ export default function Dashboard({ code }) {
           />
         ) : null}
 
-        <div className="pt-4 w-auto flex-grow h-full items-center justify-center overflow-y-scroll">
+        <div
+          onScroll={handleScroll}
+          className="pt-4 w-full flex-grow h-full items-center justify-center overflow-y-scroll"
+        >
           <Outlet
-            context={{ accessToken: accessToken, chooseTrack: chooseTrack }}
+            context={{
+              accessToken: accessToken,
+              chooseTrack: chooseTrack,
+              scrollTop: scrollTop,
+              offsetHeight: offsetHeight,
+              clientHeight: clientHeight,
+            }}
           />
         </div>
       </div>

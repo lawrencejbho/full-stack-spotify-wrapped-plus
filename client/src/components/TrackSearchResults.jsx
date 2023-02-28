@@ -4,21 +4,31 @@ export default function TrackSearchResults({
   track,
   chooseTrack,
   clearSearch,
+  index,
 }) {
   // update the track in Dashboard and clear search results in Search
   function handlePlay() {
     chooseTrack(track);
     clearSearch({ artists: track.artists, title: track.title });
   }
+
   return (
     <div
-      className="d-flex m-2 align-items-center"
-      style={{ cursor: "pointer" }}
+      className="flex pl-4 py-2 space-x-6 hover:bg-gray-100 cursor-pointer w-full"
+      key={index}
       onClick={handlePlay}
     >
-      <img src={track.albumUrl} style={{ height: "64px", width: "64px" }} />
+      <div className="flex justify-center items-center min-w-[20px]">
+        {index}
+      </div>
+      <img
+        src={track.albumUrl}
+        className="rounded-md w-[50px] h-[64px] object-cover"
+      />{" "}
       <div className="ml-3">
-        <div>{track.title}</div>
+        <div className="font-bold items-start justify-start text-start">
+          {track.title}
+        </div>
         <div className="text-muted">{track.artists}</div>
       </div>
     </div>

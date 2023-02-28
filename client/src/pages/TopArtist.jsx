@@ -22,9 +22,10 @@ export default function TopArtist({ accessToken }) {
   useEffect(() => {
     if (!location.accessToken) return;
     spotifyApi.getMyTopArtists({ time_range: timeSelect }).then((data) => {
-      console.log(data.body.items);
+      // console.log(data.body.items);
       setTopArtists(
         data.body.items.map((artist) => {
+          // albums images aren't guaranteed to be ordered by size so use reduce
           const smallestArtistImage = artist.images.reduce(
             (smallest, image) => {
               if (image.height < smallest.height) return image;
