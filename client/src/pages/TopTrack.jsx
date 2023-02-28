@@ -61,7 +61,9 @@ export default function TopTrack({ accessToken }) {
 
   return (
     <div>
-      <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
+      {topTracks.length > 0 ? (
+        <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
+      ) : null}
       {topTracks.length > 0 ? (
         <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
           {topTracks.map((track, index) => {

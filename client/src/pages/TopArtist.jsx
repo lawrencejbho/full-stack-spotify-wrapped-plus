@@ -60,7 +60,9 @@ export default function TopArtist({ accessToken }) {
 
   return (
     <div>
-      <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
+      {topArtists.length > 0 ? (
+        <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
+      ) : null}
 
       {topArtists.length > 0 ? (
         <div className="mt-12" style={{ whiteSpace: "pre" }}>

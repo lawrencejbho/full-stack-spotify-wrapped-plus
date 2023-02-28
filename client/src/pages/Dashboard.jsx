@@ -14,13 +14,13 @@ const spotifyApi = new SpotifyWebApi({
 export default function Dashboard({ code }) {
   const [playingTrack, setPlayingTrack] = useState();
   const [page, setPage] = useState("top-artists");
-  const accessToken = useAuth(code);
 
   const [scrollTop, setScrollTop] = useState(0);
   const [offsetHeight, setOffsetHeight] = useState(900);
   const [clientHeight, setClientHeight] = useState(0);
 
-  // console.log(code);
+  const accessToken = useAuth(code);
+  console.log(code);
 
   function choosePage(page) {
     setPage(page);
