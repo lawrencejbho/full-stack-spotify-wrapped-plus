@@ -1,0 +1,6 @@
+# I think this is necessary to proxy to backend on netlify, vite config and http middleware won't work 
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://spotify-wrapped-plus.herokuapp.com/api/:splat"
+  status = 200

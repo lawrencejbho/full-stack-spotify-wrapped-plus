@@ -63,4 +63,8 @@ app.get("/api/lyrics", async (req, res) => {
   res.json({ lyrics });
 });
 
-app.listen(3001);
+app.get("/api/test", (req, res) => {
+  res.send("complete");
+});
+
+app.listen(process.env.PORT || 3001);
