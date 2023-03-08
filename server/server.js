@@ -78,6 +78,15 @@ app.get("/api/artists", async (req, res) => {
   }
 });
 
+app.get("/api/tracks", async (req, res) => {
+  try {
+    const query = await pool.query("SELECT * FROM tracks");
+    res.json(query.rows[query.rows.length - 1].artists);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
 app.get("/api/genres", async (req, res) => {
   const { userId, duration } = req.query;
 
