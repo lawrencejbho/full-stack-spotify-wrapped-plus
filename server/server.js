@@ -78,7 +78,6 @@ app.get("/api/artists", async (req, res) => {
   }
 });
 
-// tracks endpoint
 app.get("/api/tracks", async (req, res) => {
   try {
     const query = await pool.query("SELECT * FROM tracks");
