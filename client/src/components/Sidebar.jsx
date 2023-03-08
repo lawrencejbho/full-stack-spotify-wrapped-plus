@@ -4,6 +4,7 @@ import SidebarItem from "./SidebarItem";
 import StarImg from "../assets/star.png";
 import HeartImg from "../assets/heart.png";
 import SearchImg from "../assets/search.png";
+import HeadphoneImg from "../assets/rounded-headphones.png";
 
 export default function Sidebar({ page, accessToken, handleClick }) {
   return (
@@ -19,11 +20,18 @@ export default function Sidebar({ page, accessToken, handleClick }) {
             page={page}
           />
           <SidebarItem
-            image={HeartImg}
+            image={HeadphoneImg}
             handleClick={handleClick}
             pathname="top-tracks"
             accessToken={accessToken}
             display="Top Tracks"
+            page={page}
+          />
+          <SidebarItem
+            image={HeartImg}
+            handleClick={handleClick}
+            pathname="top-genres"
+            display="Top Genres"
             page={page}
           />
           <SidebarItem

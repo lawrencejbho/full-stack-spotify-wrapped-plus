@@ -14,8 +14,8 @@ export default defineConfig({
     host: true,
     proxy: {
       "/api": {
-        // target: "http://localhost:3001",
-        target: "https://spotify-wrapped-plus.herokuapp.com/",
+        target: "http://localhost:3001",
+        // target: "https://spotify-wrapped-plus.herokuapp.com/",
         changeOrigin: true,
       },
     },

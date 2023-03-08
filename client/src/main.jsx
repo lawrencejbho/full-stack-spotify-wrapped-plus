@@ -6,6 +6,7 @@ import App from "./App";
 import Search from "./pages/Search.jsx";
 import TopTrack from "./pages/TopTrack.jsx";
 import TopArtist from "./pages/TopArtist.jsx";
+import TopGenres from "./pages/TopGenres.jsx";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "top-tracks",
         element: <TopTrack />,
+      },
+      {
+        path: "top-genres",
+        element: <TopGenres />,
       },
     ],
   },

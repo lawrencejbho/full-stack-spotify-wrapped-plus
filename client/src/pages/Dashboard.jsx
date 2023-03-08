@@ -14,13 +14,14 @@ const spotifyApi = new SpotifyWebApi({
 export default function Dashboard({ code }) {
   const [playingTrack, setPlayingTrack] = useState();
   const [page, setPage] = useState("top-artists");
+  const [userId, setUserId] = useState("");
 
   const [scrollTop, setScrollTop] = useState(0);
   const [offsetHeight, setOffsetHeight] = useState(900);
   const [clientHeight, setClientHeight] = useState(0);
 
   const accessToken = useAuth(code);
-  console.log(code);
+  // console.log(code);
 
   function choosePage(page) {
     setPage(page);
@@ -34,6 +35,12 @@ export default function Dashboard({ code }) {
   function handleScroll(event) {
     setScrollTop(event.currentTarget.scrollTop);
   }
+
+  useEffect(() => {
+    if (!accessToken) return;
+    spotifyApi.setAccessToken(accessToken);
+    spotifyApi.getMe().then((res) => setUserId(res.body.id));
+  }, [accessToken]);
 
   return (
     <section className="h-screen font-Rubik">
@@ -57,6 +64,7 @@ export default function Dashboard({ code }) {
               scrollTop: scrollTop,
               offsetHeight: offsetHeight,
               clientHeight: clientHeight,
+              userId: userId,
             }}
           />
         </div>
