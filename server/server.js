@@ -44,6 +44,14 @@ app.post("/api/login", (req, res) => {
   spotifyApi
     .authorizationCodeGrant(code)
     .then((data) => {
+      // use this to test loading spinner
+      // setTimeout(() => {
+      //   res.json({
+      //     accessToken: data.body.access_token,
+      //     refreshToken: data.body.refresh_token,
+      //     expiresIn: data.body.expires_in_in,
+      //   });
+      // }, 2000);
       res.json({
         accessToken: data.body.access_token,
         refreshToken: data.body.refresh_token,
