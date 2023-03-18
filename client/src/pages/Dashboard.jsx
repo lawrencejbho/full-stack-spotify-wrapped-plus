@@ -48,7 +48,7 @@ export default function Dashboard({ code }) {
   }, [accessToken]);
 
   return (
-    <section className="h-screen font-Rubik">
+    <section className="h-screen font-Rubik w-screen">
       {accessToken ? null : (
         <div className="flex h-[90%] items-center justify-center">
           <RingLoader
@@ -61,7 +61,7 @@ export default function Dashboard({ code }) {
         </div>
       )}
 
-      <div className="flex h-[89%]">
+      <div className="flex h-[89%] w-auto">
         {accessToken ? (
           <SideBar
             accessToken={accessToken}
@@ -72,7 +72,7 @@ export default function Dashboard({ code }) {
         {accessToken ? (
           <div
             onScroll={handleScroll}
-            className="pt-4 w-full flex-grow h-full items-center justify-center overflow-y-scroll"
+            className="pt-4 w-screen flex-grow h-full items-center justify-center overflow-y-scroll"
           >
             <Outlet
               context={{

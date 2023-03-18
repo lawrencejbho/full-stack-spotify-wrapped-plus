@@ -75,7 +75,7 @@ export default function TopArtist({ accessToken }) {
   }
 
   return (
-    <div>
+    <div className="">
       {topArtists.length > 0 ? (
         <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
       ) : null}

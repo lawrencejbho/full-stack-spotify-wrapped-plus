@@ -34,14 +34,14 @@ export default function SidebarItem({
   return (
     <NavLink
       to={{ pathname: `/${pathname}`, accessToken: accessToken }}
-      className="flex flex-col items-center space-x-1 rounded-md px-2 py-3 hover:bg-gray-100"
+      className="flex flex-col items-center  sm:space-x-1 rounded-md px-2 py-3 hover:bg-gray-100"
       style={styles()}
       onClick={() => handleClick(pathname)}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
     >
-      <img src={image} className="w-8" />
-      <span>{display}</span>
+      <img src={image} className="w-6 sm:w-8 text-center items-center" />
+      <span className="text-center sm:text-base text-xs">{display}</span>
     </NavLink>
   );
 }

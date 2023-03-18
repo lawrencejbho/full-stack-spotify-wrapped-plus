@@ -9,8 +9,8 @@ import HeadphoneImg from "../assets/rounded-headphones.png";
 export default function Sidebar({ page, accessToken, handleClick }) {
   return (
     <div className="inline-block ">
-      <div className=" flex w-36 h-full ">
-        <aside className="flex w-36 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2">
+      <div className=" flex w-16 h-full sm:w-36 ">
+        <aside className="flex w-16 sm:w-36 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2">
           <SidebarItem
             image={StarImg}
             handleClick={handleClick}
