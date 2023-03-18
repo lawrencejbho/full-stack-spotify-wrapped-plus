@@ -54,7 +54,6 @@ export default function Dashboard({ code }) {
           <RingLoader
             color="#1DB954"
             loading={loading}
-            // cssOverride={override}
             size={250}
             aria-label="Loading Spinner"
             data-testid="loader"
