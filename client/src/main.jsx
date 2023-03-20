@@ -11,27 +11,27 @@ import TopGenres from "./pages/TopGenres.jsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App title="Wrapped Plus" />,
     children: [
       {
         path: "/",
-        element: <TopArtist />,
+        element: <TopArtist title="Top Artists | Wrapped Plus" />,
       },
       {
         path: "search",
-        element: <Search />,
+        element: <Search title="Search | Wrapped Plus" />,
       },
       {
         path: "top-artists",
-        element: <TopArtist />,
+        element: <TopArtist title="Top Artists | Wrapped Plus" />,
       },
       {
         path: "top-tracks",
-        element: <TopTrack />,
+        element: <TopTrack title="Top Tracks | Wrapped Plus" />,
       },
       {
         path: "top-genres",
-        element: <TopGenres />,
+        element: <TopGenres title="Top Genres | Wrapped Plus" />,
       },
     ],
   },
