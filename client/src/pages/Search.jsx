@@ -17,7 +17,7 @@ const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
 });
 
-export default function Search() {
+export default function Search({ title }) {
   const [searchResults, setSearchResults] = useState([]);
   const [search, setSearch] = useState("");
   const [lyrics, setLyrics] = useState("");
@@ -124,6 +124,10 @@ export default function Search() {
         setLyrics(res.data.lyrics);
       });
   }, [playingTrack]);
+
+  useEffect(() => {
+    document.title = title;
+  }, []);
 
   return (
     <>

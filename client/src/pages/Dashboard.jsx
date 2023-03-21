@@ -47,8 +47,6 @@ export default function Dashboard({ code }) {
     spotifyApi.getMe().then((res) => setUserId(res.body.id));
   }, [accessToken]);
 
-  useEffect(() => (document.title = props.title), []);
-
   return (
     <section className="h-screen font-Rubik w-screen">
       {accessToken ? null : (

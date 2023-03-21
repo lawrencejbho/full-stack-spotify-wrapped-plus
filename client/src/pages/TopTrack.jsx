@@ -9,7 +9,7 @@ const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
 });
 
-export default function TopTrack({ accessToken }) {
+export default function TopTrack({ accessToken, title }) {
   const location = useOutletContext();
   const [topTracks, setTopTracks] = useState([]);
   const [timeSelect, setTimeSelect] = useState("long_term");
@@ -58,6 +58,10 @@ export default function TopTrack({ accessToken }) {
     console.log("hit");
     setTimeSelect(duration);
   }
+
+  useEffect(() => {
+    document.title = title;
+  }, []);
 
   return (
     <div>

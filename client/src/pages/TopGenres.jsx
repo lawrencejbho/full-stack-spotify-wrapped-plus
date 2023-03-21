@@ -5,7 +5,7 @@ import { useOutletContext } from "react-router-dom";
 import TimeSelectNav from "../components/TimeSelectNav.jsx";
 import GenreEntry from "../components/GenreEntry";
 
-export default function TopTrack({ accessToken }) {
+export default function TopTrack({ accessToken, title }) {
   const [topGenres, setTopGenres] = useState([]);
   const [timeSelect, setTimeSelect] = useState("short_term");
   const location = useOutletContext();
@@ -25,6 +25,9 @@ export default function TopTrack({ accessToken }) {
     setTimeSelect(duration);
   }
 
+  useEffect(() => {
+    document.title = title;
+  }, []);
   return (
     <div>
       {topGenres.length > 0 ? (

@@ -10,7 +10,7 @@ const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
 });
 
-export default function TopArtist({ accessToken }) {
+export default function TopArtist({ accessToken, title }) {
   const location = useOutletContext();
   const [topArtists, setTopArtists] = useState([]);
   const [timeSelect, setTimeSelect] = useState("long_term");
@@ -74,6 +74,9 @@ export default function TopArtist({ accessToken }) {
     setTimeSelect(duration);
   }
 
+  useEffect(() => {
+    document.title = title;
+  }, []);
   return (
     <div className="">
       {topArtists.length > 0 ? (
