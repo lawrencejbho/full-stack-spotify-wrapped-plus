@@ -5,6 +5,7 @@ module.exports = {
     extend: {},
     fontFamily: {
       Rubik: ["Rubik", "sans-serif"],
+      Montserrat: ["Montserrat", "sans-serif"],
     },
   },
   plugins: [],
