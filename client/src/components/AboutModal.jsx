@@ -67,7 +67,8 @@ export default function modal() {
                       Made by{" "}
                       <a
                         href="https://github.com/lawrencejbho"
-                        className="text-blue-500"
+                        className="text-blue-500 cursor-pointer"
+                        target="_blank"
                       >
                         Lawrence Ho
                       </a>

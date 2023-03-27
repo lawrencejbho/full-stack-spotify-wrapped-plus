@@ -78,7 +78,7 @@ export default function TopArtist({ accessToken, title }) {
     document.title = title;
   }, []);
   return (
-    <div className="">
+    <div className="overflow-x-hidden">
       {topArtists.length > 0 ? (
         <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
       ) : null}
