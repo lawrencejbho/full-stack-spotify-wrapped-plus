@@ -12,7 +12,7 @@ const AUTH_URL =
 
 export default function Login() {
   return (
-    <div className="bg-gray-400">
+    <div className="bg-gray-400 ">
       <div className="flex justify-center">
         <div className="bottom-16 absolute z-30 flex space-x-2">
           <AboutModal className="" />
@@ -25,8 +25,8 @@ export default function Login() {
         </span>
       </div>
 
-      <div className="h-screen w-screen z-0 absolute flex items-center justify-start sm:justify-center">
-        <img src={Hero} className=" sm:w-[75%] xl:w-[850px]" />
+      <div className="h-screen w-screen overflow-hidden z-0 absolute flex items-center justify-start sm:justify-center">
+        <img src={Hero} className=" sm:w-[75%] xl:w-[850px] " />
       </div>
 
       <section className="z-20 flex items-end  sm:items-center justify-center h-screen w-screen">
