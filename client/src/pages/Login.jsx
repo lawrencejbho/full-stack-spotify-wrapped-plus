@@ -4,11 +4,11 @@ import PrivacyModal from "../components/PrivacyModal.jsx";
 
 import Hero from "../assets/wp.png";
 
-// const AUTH_URL =
-//   "https://accounts.spotify.com/authorize?client_id=42d4174a9b25462c83b89191088e7abf&response_type=code&redirect_uri=http://localhost:5173&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read";
-
 const AUTH_URL =
-  "https://accounts.spotify.com/authorize?client_id=501daf7d1dfb43a291ccc64c91c8a4c8&response_type=code&redirect_uri=https://wrappedplus.com&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read";
+  "https://accounts.spotify.com/authorize?client_id=42d4174a9b25462c83b89191088e7abf&response_type=code&redirect_uri=http://localhost:5173&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read%20user-read-recently-played";
+
+// const AUTH_URL =
+//   "https://accounts.spotify.com/authorize?client_id=501daf7d1dfb43a291ccc64c91c8a4c8&response_type=code&redirect_uri=https://wrappedplus.com&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read";
 
 export default function Login() {
   return (
@@ -31,7 +31,7 @@ export default function Login() {
 
       <section className="z-20 flex items-end  sm:items-center justify-center h-screen w-screen">
         <a className="" href={AUTH_URL}>
-          <button className="group relative border mb-24 sm:mb-0 h-12 w-48 overflow-hidden rounded-lg bg-white text-lg shadow">
+          <button className="group relative border mb-32 sm:mb-0 h-12 w-48 overflow-hidden rounded-lg bg-white text-lg shadow">
             <div className="absolute inset-0 w-3 bg-green-400 transition-all duration-[250ms] ease-out group-hover:w-full"></div>
             <span className="relative text-gray-700 group-hover:text-white font-Rubik">
               Login With Spotify

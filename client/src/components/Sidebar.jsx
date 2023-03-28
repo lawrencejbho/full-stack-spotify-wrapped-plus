@@ -42,6 +42,14 @@ export default function Sidebar({ page, accessToken, handleClick }) {
             display="Search"
             page={page}
           />
+          <SidebarItem
+            image={SearchImg}
+            handleClick={handleClick}
+            pathname="recent"
+            accessToken={accessToken}
+            display="Recent"
+            page={page}
+          />
         </aside>
       </div>
     </div>

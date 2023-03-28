@@ -7,6 +7,7 @@ import Search from "./pages/Search.jsx";
 import TopTrack from "./pages/TopTrack.jsx";
 import TopArtist from "./pages/TopArtist.jsx";
 import TopGenres from "./pages/TopGenres.jsx";
+import Recent from "./pages/Recent.jsx";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "top-genres",
         element: <TopGenres title="Top Genres | Wrapped Plus" />,
+      },
+      {
+        path: "recent",
+        element: <Recent title="Recent | Wrapped Plus" />,
       },
     ],
   },

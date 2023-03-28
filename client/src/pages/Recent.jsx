@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import SpotifyWebApi from "spotify-web-api-node";
+import TrackEntry from "../components/TrackEntry.jsx";
+
+import axios from "axios";
 
 const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
@@ -8,52 +11,75 @@ const spotifyApi = new SpotifyWebApi({
 
 export default function Recent({ accessToken, title }) {
   const location = useOutletContext();
-  const [recent, setRecent = useState([]);
+  const [recent, setRecent] = useState([]);
+  const [todayDuration, setTodayDuration] = useState(0);
 
   useEffect(() => {
     if (!location.accessToken) return;
     spotifyApi.setAccessToken(location.accessToken);
   }, [location.accessToken]);
 
-  // need to update the scope to get top
   useEffect(() => {
     if (!location.accessToken) return;
 
-    spotifyApi.getMyTopTracks({ time_range: timeSelect }).then((data) => {
-      // console.log(data.body.items);
-      setTopTracks(
-        data.body.items.map((track) => {
-          const smallestAlbumImage = track.album.images.reduce(
-            (smallest, image) => {
-              if (image.height < smallest.height) return image;
-              return smallest;
-            },
-            track.album.images[0]
-          );
-          let artists_string = "";
-          track.artists.forEach((artist, index) => {
-            if (index + 1 == track.artists.length) {
-              return (artists_string += `${artist.name}`);
-            } else {
-              return (artists_string += `${artist.name}, `);
-            }
-          });
+    axios
+      .get("https://api.spotify.com/v1/me/player/recently-played", {
+        params: {
+          limit: 20,
+          access_token: location.accessToken,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setRecent(
+          res?.data?.items?.map((item) => {
+            const smallestAlbumImage = item.track.album.images.reduce(
+              (smallest, image) => {
+                if (image.height < smallest.height) return image;
+                return smallest;
+              },
+              item.track.album.images[0]
+            );
+            let artists_string = "";
+            item.track.artists.forEach((artist, index) => {
+              if (index + 1 == item.track.artists.length) {
+                return (artists_string += `${artist.name}`);
+              } else {
+                return (artists_string += `${artist.name}, `);
+              }
+            });
 
-          return {
-            artist: artists_string,
-            name: track.name,
-            uri: track.uri,
-            albumUrl: smallestAlbumImage.url,
-          };
-        })
-      );
+            return {
+              artist: artists_string,
+              name: item.track.name,
+              uri: item.track.uri,
+              albumUrl: smallestAlbumImage.url,
+              duration: item.track.duration_ms,
+              date: item.played_at,
+            };
+          })
+        );
+      })
+      .catch((error) => {
+        // console.log(error);
+      });
+  }, [location.accessToken]);
+
+  useEffect(() => {
+    if (recent.length < 1) return;
+    let recent_array = recent.map((entry) => ({
+      duration: entry.duration,
+      date: entry.date,
+    }));
+    console.log(recent_array);
+
+    axios.post("/api/artists", {
+      params: {
+        recent: recent_array,
+        userId: location.userId,
+      },
     });
-  }, [location.accessToken, timeSelect]);
-
-  function changeTime(duration) {
-    console.log("hit");
-    setTimeSelect(duration);
-  }
+  }, [recent]);
 
   useEffect(() => {
     document.title = title;
@@ -61,12 +87,9 @@ export default function Recent({ accessToken, title }) {
 
   return (
     <div>
-      {topTracks.length > 0 ? (
-        <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
-      ) : null}
-      {topTracks.length > 0 ? (
+      {recent.length > 0 ? (
         <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
-          {topTracks.map((track, index) => {
+          {recent.map((track, index) => {
             return (
               <TrackEntry
                 track={track}
