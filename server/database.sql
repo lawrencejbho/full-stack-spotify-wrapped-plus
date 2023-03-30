@@ -19,6 +19,20 @@ CREATE TABLE genres(
     user_id varchar
 );
 
+CREATE TABLE recent_tracks(
+    tracks text[],
+    created_at timestamp NOT NULL DEFAULT now(),
+    user_id varchar
+);
+
+CREATE TABLE listening_history(
+    duration varchar,
+    date_string varchar,
+    created_at timestamp NOT NULL DEFAULT now(),
+    user_id varchar
+);
+
+
 
 
 -- CREATE Table users(

@@ -84,20 +84,20 @@ export default function Recent({ accessToken, title }) {
     });
   }, [recent]);
 
-  // useEffect(() => {
-  //   if (!location.accessToken) return;
-  //   console.log("hit");
-  //   axios
-  //     .get("/api/time-listened", {
-  //       params: {
-  //         userId: location.userId,
-  //       },
-  //     })
-  //     .then((res) => {
-  //       console.log(res);
-  //       setTimeListened(res.data.duration / 1000);
-  //     });
-  // }, [location.accessToken]);
+  useEffect(() => {
+    if (!location.accessToken) return;
+    console.log("hit");
+    axios
+      .get("/api/time-listened-today", {
+        params: {
+          userId: location.userId,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setTimeListened(res.data.duration / 1000);
+      });
+  }, [location.accessToken]);
 
   useEffect(() => {
     document.title = title;
@@ -105,8 +105,10 @@ export default function Recent({ accessToken, title }) {
 
   return (
     <div>
-      {timeListened > 0 ? Math.floor(timeListened / 3600) : null}
-      {timeListened > 0 ? Math.floor((timeListened / 60) % 60) : null}
+      {timeListened > 0 ? `${Math.floor(timeListened / 3600)} hours ` : null}
+      {timeListened > 0
+        ? ` ${Math.floor((timeListened / 60) % 60)} minutes`
+        : null}
       {recent.length > 0 ? (
         <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
           {recent.map((track, index) => {

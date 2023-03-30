@@ -154,29 +154,25 @@ app.post("/api/artists", async (req, res) => {
 
 app.post("/api/recent-tracks", async (req, res) => {
   const { recent_tracks, userId } = req.body.params;
-  let update_array = [];
+  let updateArray = [];
 
   try {
-    // check if we have an entry for today already
-    // const query = await pool.query(
-    //   "SELECT * FROM recent_tracks WHERE user_id = $1",
-    //   [userId]
-    // );
-
+    // this will grab the newest database entry
     const query = await pool.query(
-      "SELECT * FROM recent_tracks ORDER BY created_at DESC LIMIT 1"
+      "SELECT * FROM recent_tracks WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1",
+      [userId]
     );
+    // console.log(query.rows[0]);
 
-    console.log(query.rows[0]);
-    console.log(query.rows.length);
+    // there can be multiple tracks per entry
+    // If our database is empty, add to our update the tracks for today
     if (query.rows.length == 0) {
-      console.log("hit");
       let currentDate = new Date().toISOString().split("T")[0];
 
-      for (let i = recent_tracks.length - 1; i > -1; i--) {
+      for (let i = recent_tracks.length - 1; i >= 0; i--) {
         if (recent_tracks[i].date.slice(0, 10) == currentDate) {
           console.log(i);
-          update_array.push(recent_tracks[i]);
+          updateArray.push(recent_tracks[i]);
         }
       }
       return;
@@ -184,36 +180,34 @@ app.post("/api/recent-tracks", async (req, res) => {
 
     // it comes back as a string so use JSON parse to put it back as an object
     // add any entries newer than our last entry into the update array
-    console.log(query.rows[0].created_at);
+
+    // console.log("latest entry created_at " + query.rows[0].created_at);
     const length = query.rows[0].tracks.length;
-    console.log("length" + length);
-    const latest = JSON.parse(
-      query.rows[query.rows.length - 1].tracks[length - 1]
-    );
+    // console.log("length" + length);
+    const latestEntry = JSON.parse(query.rows[0].tracks[length - 1]);
 
-    console.log("latest" + latest.date);
-    let currentDate = latest.date.slice(0, 10);
-    let currentTimestamp = convertToTimestamp(latest.date);
+    // console.log("latest entry date" + latestEntry.date);
 
-    for (let i = recent_tracks.length - 1; i > -1; i--) {
-      if (recent_tracks[i].date.slice(0, 10) == currentDate) {
-        if (convertToTimestamp(recent_tracks[i].date) > currentTimestamp) {
-          console.log("first" + convertToTimestamp(recent_tracks[i].date));
-          console.log("second" + currentTimestamp);
-          console.log(recent_tracks[i]);
-          update_array.push(recent_tracks[i]);
+    let latestDate = latestEntry.date.slice(0, 10);
+    let latestTimestamp = convertToTimestamp(latestEntry.date);
+
+    for (let i = recent_tracks.length - 1; i >= 0; i--) {
+      if (recent_tracks[i].date.slice(0, 10) == latestDate) {
+        if (convertToTimestamp(recent_tracks[i].date) > latestTimestamp) {
+          console.log("added track " + recent_tracks[i]);
+          updateArray.push(recent_tracks[i]);
         }
       }
     }
   } catch (err) {
     console.log(err.message);
   } finally {
-    console.log(update_array.length);
-    // create a new entry or update the existing one
-    if (update_array.length > 0) {
+    console.log(updateArray.length);
+    // create a new entry anytime there's an update
+    if (updateArray.length > 0) {
       const query = await pool.query(
         "INSERT INTO recent_tracks(tracks,user_id) VALUES ($1, $2) RETURNING *",
-        [update_array, userId]
+        [updateArray, userId]
       );
       res.sendStatus(200);
     }
@@ -259,29 +253,46 @@ function getCurrentTimestamp() {
   return Math.floor(timestamp / 1000);
 }
 
-app.get("/api/time-listened", async (req, res) => {
+app.get("/api/time-listened-today", async (req, res) => {
   const { userId } = req.query;
-  console.log(userId);
 
   try {
-    // check if we have an entry for today already
-    // const query = await pool.query(
-    //   "SELECT tracks FROM recent_tracks WHERE user_id = $1",
-    //   [userId]
-    // );
     const query = await pool.query(
       "SELECT tracks FROM recent_tracks WHERE user_id = $1",
       [userId]
     );
-    console.log(query.rows[0].tracks);
-    const trackArray = query.rows[0].tracks;
-    console.log(trackArray);
-
+    // console.log(query.rows);
     let total = 0;
-    trackArray.forEach((track) => {
-      let object = JSON.parse(track);
-      total += object.duration;
+    query.rows.forEach((row) => {
+      row.tracks.forEach((track) => {
+        let obj = JSON.parse(track);
+        total += obj.duration;
+      });
     });
+
+    res.json({ duration: total });
+  } catch (error) {
+    console.log(error.message);
+  }
+});
+
+app.get("/api/listening-history", async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    const query = await pool.query(
+      "SELECT tracks FROM recent_tracks WHERE user_id = $1",
+      [userId]
+    );
+    // console.log(query.rows);
+    let total = 0;
+    query.rows.forEach((row) => {
+      row.tracks.forEach((track) => {
+        let obj = JSON.parse(track);
+        total += obj.duration;
+      });
+    });
+
     res.json({ duration: total });
   } catch (error) {
     console.log(error.message);
