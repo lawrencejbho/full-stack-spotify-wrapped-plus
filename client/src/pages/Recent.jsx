@@ -13,6 +13,7 @@ export default function Recent({ accessToken, title }) {
   const location = useOutletContext();
   const [recent, setRecent] = useState([]);
   const [todayDuration, setTodayDuration] = useState(0);
+  const [timeListened, setTimeListened] = useState(0);
 
   useEffect(() => {
     if (!location.accessToken) return;
@@ -25,7 +26,7 @@ export default function Recent({ accessToken, title }) {
     axios
       .get("https://api.spotify.com/v1/me/player/recently-played", {
         params: {
-          limit: 20,
+          limit: 50,
           access_token: location.accessToken,
         },
       })
@@ -67,19 +68,36 @@ export default function Recent({ accessToken, title }) {
 
   useEffect(() => {
     if (recent.length < 1) return;
-    let recent_array = recent.map((entry) => ({
-      duration: entry.duration,
-      date: entry.date,
-    }));
+    let recent_array = recent.map((entry) => {
+      return {
+        duration: entry.duration,
+        date: entry.date,
+      };
+    });
     console.log(recent_array);
 
-    axios.post("/api/artists", {
+    axios.post("/api/recent-tracks", {
       params: {
-        recent: recent_array,
+        recent_tracks: recent_array,
         userId: location.userId,
       },
     });
   }, [recent]);
+
+  // useEffect(() => {
+  //   if (!location.accessToken) return;
+  //   console.log("hit");
+  //   axios
+  //     .get("/api/time-listened", {
+  //       params: {
+  //         userId: location.userId,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       console.log(res);
+  //       setTimeListened(res.data.duration / 1000);
+  //     });
+  // }, [location.accessToken]);
 
   useEffect(() => {
     document.title = title;
@@ -87,6 +105,8 @@ export default function Recent({ accessToken, title }) {
 
   return (
     <div>
+      {timeListened > 0 ? Math.floor(timeListened / 3600) : null}
+      {timeListened > 0 ? Math.floor((timeListened / 60) % 60) : null}
       {recent.length > 0 ? (
         <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
           {recent.map((track, index) => {
