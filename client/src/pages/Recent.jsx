@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import SpotifyWebApi from "spotify-web-api-node";
 import TrackEntry from "../components/TrackEntry.jsx";
+import ListeningHistoryChart from "../components/ListeningHistoryChart.jsx";
 
 import axios from "axios";
 
@@ -88,14 +89,15 @@ export default function Recent({ accessToken, title }) {
     if (!location.accessToken) return;
     console.log("hit");
     axios
-      .get("/api/time-listened-today", {
+      .get("/api/listening-history", {
         params: {
           userId: location.userId,
         },
       })
       .then((res) => {
         console.log(res);
-        setTimeListened(res.data.duration / 1000);
+        setTimeListened(res.data);
+        // setTimeListened(res.data.duration / 1000);
       });
   }, [location.accessToken]);
 
@@ -105,10 +107,12 @@ export default function Recent({ accessToken, title }) {
 
   return (
     <div>
-      {timeListened > 0 ? `${Math.floor(timeListened / 3600)} hours ` : null}
+      {/* {timeListened > 0 ? `${Math.floor(timeListened / 3600)} hours ` : null}
       {timeListened > 0
         ? ` ${Math.floor((timeListened / 60) % 60)} minutes`
-        : null}
+        : null} */}
+      {/* <ListeningHistoryChart /> */}
+      {timeListened.duration > 0 ? timeListened.duration : null}
       {recent.length > 0 ? (
         <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
           {recent.map((track, index) => {

@@ -154,63 +154,172 @@ app.post("/api/artists", async (req, res) => {
 
 app.post("/api/recent-tracks", async (req, res) => {
   const { recent_tracks, userId } = req.body.params;
-  let updateArray = [];
+  let todayUpdate = [];
+  let yesterdayUpdate = [];
+  let currentDate = new Date().toISOString().split("T")[0];
 
   try {
     // this will grab the newest database entry
     const query = await pool.query(
-      "SELECT * FROM recent_tracks WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1",
-      [userId]
+      "SELECT * FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2 ORDER BY created_at DESC LIMIT 1",
+      [userId, currentDate]
     );
-    // console.log(query.rows[0]);
+    console.log(query.rows[0]);
+
+    const listeningHistoryQuery = await pool.query(
+      "SELECT duration, calendar_date FROM listening_history WHERE user_id = $1 AND calendar_date = $2",
+      [userId, getYesterdayDate()]
+    );
+
+    if (listeningHistoryQuery.rows.length > 0) {
+      const query2 = await pool.query(
+        "SELECT * FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2 ORDER BY created_at DESC LIMIT 1",
+        [userId, getYesterdayDate()]
+      );
+      console.log(query2.rows[0]);
+    }
 
     // there can be multiple tracks per entry
-    // If our database is empty, add to our update the tracks for today
-    if (query.rows.length == 0) {
-      let currentDate = new Date().toISOString().split("T")[0];
+    // If our database is empty, add to our update the tracks for today and yesterday
+    function addToUpdateArray(query, date, updateArray) {
+      if (query.rows.length == 0) {
+        for (let i = recent_tracks.length - 1; i >= 0; i--) {
+          if (recent_tracks[i].date.slice(0, 10) == date) {
+            console.log(i);
+            updateArray.push(recent_tracks[i]);
+          }
+        }
+        return;
+      }
+
+      // it comes back as a string so use JSON parse to put it back as an object
+      // add any entries newer than our last entry into the update array
+      const latestLength = query.rows[0].tracks.length;
+      // console.log("length" + length);
+      const latestEntry = JSON.parse(query.rows[0].tracks[latestLength - 1]);
+      console.log("latest entry date " + latestEntry.date);
+
+      let latestDate = query.rows[0].calendar_date;
+      console.log(latestDate);
+      let latestTimestamp = convertToTimestamp(latestEntry.date);
 
       for (let i = recent_tracks.length - 1; i >= 0; i--) {
-        if (recent_tracks[i].date.slice(0, 10) == currentDate) {
-          console.log(i);
-          updateArray.push(recent_tracks[i]);
+        if (recent_tracks[i].date.slice(0, 10) == latestDate) {
+          if (convertToTimestamp(recent_tracks[i].date) > latestTimestamp) {
+            console.log(recent_tracks[i]);
+            updateArray.push(recent_tracks[i]);
+          }
         }
       }
-      return;
     }
 
-    // it comes back as a string so use JSON parse to put it back as an object
-    // add any entries newer than our last entry into the update array
+    addToUpdateArray(query, currentDate, todayUpdate);
+    addToUpdateArray(query2, getYesterdayDate(), yesterdayUpdate);
 
     // console.log("latest entry created_at " + query.rows[0].created_at);
-    const length = query.rows[0].tracks.length;
-    // console.log("length" + length);
-    const latestEntry = JSON.parse(query.rows[0].tracks[length - 1]);
-
-    // console.log("latest entry date" + latestEntry.date);
-
-    let latestDate = latestEntry.date.slice(0, 10);
-    let latestTimestamp = convertToTimestamp(latestEntry.date);
-
-    for (let i = recent_tracks.length - 1; i >= 0; i--) {
-      if (recent_tracks[i].date.slice(0, 10) == latestDate) {
-        if (convertToTimestamp(recent_tracks[i].date) > latestTimestamp) {
-          console.log("added track " + recent_tracks[i]);
-          updateArray.push(recent_tracks[i]);
-        }
-      }
-    }
   } catch (err) {
     console.log(err.message);
   } finally {
-    console.log(updateArray.length);
+    console.log("todayUpdate " + todayUpdate.length);
+    console.log("yesterdayUpdate " + yesterdayUpdate.length);
     // create a new entry anytime there's an update
-    if (updateArray.length > 0) {
-      const query = await pool.query(
-        "INSERT INTO recent_tracks(tracks,user_id) VALUES ($1, $2) RETURNING *",
-        [updateArray, userId]
-      );
-      res.sendStatus(200);
+
+    async function updateDatabase(updateArray, date) {
+      if (updateArray.length > 0) {
+        const query = await pool.query(
+          "INSERT INTO recent_tracks(tracks,user_id, calendar_date) VALUES ($1, $2, $3) RETURNING *",
+          [updateArray, userId, date]
+        );
+      }
     }
+    updateDatabase(todayUpdate, currentDate);
+    updateDatabase(yesterdayUpdate, getYesterdayDate());
+
+    res.sendStatus(200);
+  }
+});
+
+app.get("/api/time-listened-today", async (req, res) => {
+  const { userId } = req.query;
+
+  let currentDate = new Date().toISOString().split("T")[0];
+  try {
+    const query = await pool.query(
+      "SELECT tracks FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
+      [userId, currentDate]
+    );
+    // console.log(query.rows);
+    let total = 0;
+    query.rows.forEach((row) => {
+      row.tracks.forEach((track) => {
+        let obj = JSON.parse(track);
+        total += obj.duration;
+      });
+    });
+
+    res.json({ duration: total });
+  } catch (error) {
+    console.log(error.message);
+  }
+});
+
+app.get("/api/listening-history", async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    // first check if listening history is already there
+    const listeningHistoryQuery = await pool.query(
+      "SELECT duration, calendar_date FROM listening_history WHERE user_id = $1 AND calendar_date = $2",
+      [userId, getYesterdayDate()]
+    );
+
+    console.log(listeningHistoryQuery.rows);
+
+    res.json(listeningHistoryQuery.rows);
+
+    // even if we send a res, we can now
+    // go through yesterday's tracks and figure out what the final number is then add it to listening history database
+
+    console.log("listening history");
+
+    const recentTracksQuery = await pool.query(
+      "SELECT tracks FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
+      [userId, getYesterdayDate()]
+    );
+
+    // console.log(query.rows);
+    let total = 0;
+    if (recentTracksQuery.rows.length > 0) {
+      recentTracksQuery.rows.forEach((row) => {
+        row.tracks.forEach((track) => {
+          let obj = JSON.parse(track);
+          total += obj.duration;
+        });
+      });
+    }
+
+    async function updateDatabase(duration, date) {
+      const updateQuery = await pool.query(
+        "INSERT INTO listening_history(duration,user_id, calendar_date) VALUES ($1, $2, $3) RETURNING *",
+        [duration, userId, date]
+      );
+    }
+
+    async function deleteYesterdayEntries(date) {
+      const deleteQuery = await pool.query(
+        "DELETE FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
+        [userId, date]
+      );
+    }
+
+    if (total > 0) {
+      console.log(total);
+      updateDatabase(total, getYesterdayDate());
+      deleteYesterdayEntries(getYesterdayDate());
+      console.log("deleted tracks");
+    }
+  } catch (error) {
+    console.log(error.message);
   }
 });
 
@@ -253,50 +362,23 @@ function getCurrentTimestamp() {
   return Math.floor(timestamp / 1000);
 }
 
-app.get("/api/time-listened-today", async (req, res) => {
-  const { userId } = req.query;
-
-  try {
-    const query = await pool.query(
-      "SELECT tracks FROM recent_tracks WHERE user_id = $1",
-      [userId]
-    );
-    // console.log(query.rows);
-    let total = 0;
-    query.rows.forEach((row) => {
-      row.tracks.forEach((track) => {
-        let obj = JSON.parse(track);
-        total += obj.duration;
-      });
-    });
-
-    res.json({ duration: total });
-  } catch (error) {
-    console.log(error.message);
+function getYesterdayDate() {
+  function getTodayTimestamp() {
+    const startOfDay = new Date();
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const timestamp = new Date(startOfDay.setUTCHours(0, 0, 0, 0)).getTime();
+    return timestamp;
   }
-});
 
-app.get("/api/listening-history", async (req, res) => {
-  const { userId } = req.query;
-
-  try {
-    const query = await pool.query(
-      "SELECT tracks FROM recent_tracks WHERE user_id = $1",
-      [userId]
-    );
-    // console.log(query.rows);
-    let total = 0;
-    query.rows.forEach((row) => {
-      row.tracks.forEach((track) => {
-        let obj = JSON.parse(track);
-        total += obj.duration;
-      });
-    });
-
-    res.json({ duration: total });
-  } catch (error) {
-    console.log(error.message);
+  function getYesterdayTimestamp() {
+    return getTodayTimestamp() - 86400000;
   }
-});
+
+  // returns a string in YYYY-MM-DD format
+  let yesterdayDate = new Date(getYesterdayTimestamp())
+    .toISOString()
+    .split("T")[0];
+  return yesterdayDate;
+}
 
 app.listen(process.env.PORT || 3001);
