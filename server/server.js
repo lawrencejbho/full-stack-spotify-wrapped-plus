@@ -164,6 +164,7 @@ app.post("/api/recent-tracks", async (req, res) => {
       "SELECT * FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2 ORDER BY created_at DESC LIMIT 1",
       [userId, currentDate]
     );
+    console.log("latest track from today");
     console.log(query.rows[0]);
 
     const listeningHistoryQuery = await pool.query(
@@ -171,12 +172,17 @@ app.post("/api/recent-tracks", async (req, res) => {
       [userId, getYesterdayDate()]
     );
 
-    if (listeningHistoryQuery.rows.length > 0) {
-      const query2 = await pool.query(
+    let query2 = [];
+
+    if (listeningHistoryQuery.rows.length == 0) {
+      query2 = await pool.query(
         "SELECT * FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2 ORDER BY created_at DESC LIMIT 1",
         [userId, getYesterdayDate()]
       );
+      console.log("latest track from yesterday");
       console.log(query2.rows[0]);
+    } else {
+      console.log("already have listening history for yesterday");
     }
 
     // there can be multiple tracks per entry
@@ -202,7 +208,6 @@ app.post("/api/recent-tracks", async (req, res) => {
       let latestDate = query.rows[0].calendar_date;
       console.log(latestDate);
       let latestTimestamp = convertToTimestamp(latestEntry.date);
-
       for (let i = recent_tracks.length - 1; i >= 0; i--) {
         if (recent_tracks[i].date.slice(0, 10) == latestDate) {
           if (convertToTimestamp(recent_tracks[i].date) > latestTimestamp) {
@@ -214,9 +219,10 @@ app.post("/api/recent-tracks", async (req, res) => {
     }
 
     addToUpdateArray(query, currentDate, todayUpdate);
-    addToUpdateArray(query2, getYesterdayDate(), yesterdayUpdate);
-
-    // console.log("latest entry created_at " + query.rows[0].created_at);
+    // query2 won't send if there is listening history so need to add this check to avoid getting undefined
+    if (listeningHistoryQuery.rows.length == 0) {
+      addToUpdateArray(query2, getYesterdayDate(), yesterdayUpdate);
+    }
   } catch (err) {
     console.log(err.message);
   } finally {
@@ -269,8 +275,8 @@ app.get("/api/listening-history", async (req, res) => {
   try {
     // first check if listening history is already there
     const listeningHistoryQuery = await pool.query(
-      "SELECT duration, calendar_date FROM listening_history WHERE user_id = $1 AND calendar_date = $2",
-      [userId, getYesterdayDate()]
+      "SELECT duration, calendar_date FROM listening_history WHERE user_id = $1 ",
+      [userId]
     );
 
     console.log(listeningHistoryQuery.rows);

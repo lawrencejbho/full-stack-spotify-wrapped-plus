@@ -14,7 +14,8 @@ export default function Recent({ accessToken, title }) {
   const location = useOutletContext();
   const [recent, setRecent] = useState([]);
   const [todayDuration, setTodayDuration] = useState(0);
-  const [timeListened, setTimeListened] = useState(0);
+  const [listeningHistory, setListeningHistory] = useState([]);
+  const [timeListenedToday, setTimeListenedToday] = useState(0);
 
   useEffect(() => {
     if (!location.accessToken) return;
@@ -67,6 +68,7 @@ export default function Recent({ accessToken, title }) {
       });
   }, [location.accessToken]);
 
+  // chain the time listened request to happen after so that we can update our database before calculating yesterday's total
   useEffect(() => {
     if (recent.length < 1) return;
     let recent_array = recent.map((entry) => {
@@ -77,29 +79,45 @@ export default function Recent({ accessToken, title }) {
     });
     console.log(recent_array);
 
-    axios.post("/api/recent-tracks", {
-      params: {
-        recent_tracks: recent_array,
-        userId: location.userId,
-      },
-    });
+    axios
+      .post("/api/recent-tracks", {
+        params: {
+          recent_tracks: recent_array,
+          userId: location.userId,
+        },
+      })
+      .then((response) => {
+        return axios
+          .get("/api/listening-history", {
+            params: {
+              userId: location.userId,
+            },
+          })
+          .then((res) => {
+            setListeningHistory(
+              res.data.map((entry) => {
+                return { ...entry, duration: parseInt(entry.duration) };
+              })
+            );
+          });
+      });
   }, [recent]);
 
   useEffect(() => {
     if (!location.accessToken) return;
     console.log("hit");
     axios
-      .get("/api/listening-history", {
+      .get("/api/time-listened-today", {
         params: {
           userId: location.userId,
         },
       })
       .then((res) => {
-        console.log(res);
-        setTimeListened(res.data);
-        // setTimeListened(res.data.duration / 1000);
+        setTimeListenedToday(res.data.duration);
       });
   }, [location.accessToken]);
+
+  // console.log(timeListenedToday);
 
   useEffect(() => {
     document.title = title;
@@ -107,12 +125,15 @@ export default function Recent({ accessToken, title }) {
 
   return (
     <div>
-      {/* {timeListened > 0 ? `${Math.floor(timeListened / 3600)} hours ` : null}
-      {timeListened > 0
-        ? ` ${Math.floor((timeListened / 60) % 60)} minutes`
-        : null} */}
-      {/* <ListeningHistoryChart /> */}
-      {timeListened.duration > 0 ? timeListened.duration : null}
+      {timeListenedToday > 0
+        ? `${Math.floor(timeListenedToday / 3600000)} hours `
+        : null}
+      {timeListenedToday > 0
+        ? ` ${Math.floor((timeListenedToday / 60000) % 60)} minutes`
+        : null}
+      {listeningHistory.length > 0 ? (
+        <ListeningHistoryChart data={listeningHistory} />
+      ) : null}
       {recent.length > 0 ? (
         <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
           {recent.map((track, index) => {
