@@ -133,7 +133,7 @@ export default function ListeningHistory({ accessToken, title }) {
         : null} */}
 
       {listeningHistory.length > 0 ? (
-        <div className="w-[600px]">
+        <div className="sm:w-[600px] w-[300px]">
           <span className="font-bold flex justify-center">
             Listening History
           </span>

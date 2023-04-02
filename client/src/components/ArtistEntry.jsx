@@ -3,7 +3,7 @@ import React from "react";
 export default function ArtistEntry({ albumUrl, name, genres, index }) {
   return (
     <div
-      className="w-screen flex pl-4 py-2 space-x-6 hover:bg-gray-100"
+      className="w-screen flex pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6 hover:bg-gray-100"
       key={index}
     >
       <div className="flex justify-center items-center min-w-[20px]">

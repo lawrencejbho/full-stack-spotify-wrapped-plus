@@ -1,13 +1,12 @@
 import React from "react";
 import {
-  Line,
-  LineChart,
   Area,
   AreaChart,
   CartesianGrid,
   YAxis,
   XAxis,
   Tooltip,
+  ResponsiveContainer,
 } from "recharts";
 
 // const data = [
@@ -36,19 +35,19 @@ function ListeningHistoryChart({ data }) {
   };
 
   return (
-    <AreaChart
-      width={600}
-      height={300}
-      data={data}
-      className="overflow-hidden"
-      margin={{ top: 5, right: 50, bottom: 5, left: 0 }}
-    >
-      <Area type="monotone" dataKey="duration" stroke="#2196F3" />
-      <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-      <XAxis dataKey="calendar_date" />
-      <YAxis />
-      <Tooltip content={<CustomTooltip />} />
-    </AreaChart>
+    <ResponsiveContainer width="100%" height={300}>
+      <AreaChart
+        data={data}
+        className="overflow-hidden"
+        margin={{ top: 5, right: 50, bottom: 5, left: 0 }}
+      >
+        <Area type="monotone" dataKey="duration" stroke="#2196F3" />
+        <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
+        <XAxis dataKey="calendar_date" />
+        <YAxis />
+        <Tooltip content={<CustomTooltip />} />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 }
 

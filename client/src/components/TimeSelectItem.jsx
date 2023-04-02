@@ -31,7 +31,7 @@ export default function TimeSelectItem({
   return (
     <div
       onClick={() => handleClick(duration)}
-      className="cursor-pointer flex  text-center"
+      className="cursor-pointer flex justify-center text-center w-[48px] sm:w-[140px]"
       style={styles()}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}

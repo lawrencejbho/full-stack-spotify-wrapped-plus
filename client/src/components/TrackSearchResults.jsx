@@ -14,7 +14,7 @@ export default function TrackSearchResults({
 
   return (
     <div
-      className="flex pl-4 py-2 space-x-6 hover:bg-gray-100 cursor-pointer w-full"
+      className=" flex pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6 hover:bg-gray-100 cursor-pointer w-full"
       key={index}
       onClick={handlePlay}
     >
