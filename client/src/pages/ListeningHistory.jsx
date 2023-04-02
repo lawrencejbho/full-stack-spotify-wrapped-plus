@@ -10,7 +10,7 @@ const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
 });
 
-export default function Recent({ accessToken, title }) {
+export default function ListeningHistory({ accessToken, title }) {
   const location = useOutletContext();
   const [recent, setRecent] = useState([]);
   const [todayDuration, setTodayDuration] = useState(0);
@@ -33,7 +33,7 @@ export default function Recent({ accessToken, title }) {
         },
       })
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setRecent(
           res?.data?.items?.map((item) => {
             const smallestAlbumImage = item.track.album.images.reduce(
@@ -77,7 +77,7 @@ export default function Recent({ accessToken, title }) {
         date: entry.date,
       };
     });
-    console.log(recent_array);
+    // console.log(recent_array);
 
     axios
       .post("/api/recent-tracks", {
@@ -96,7 +96,10 @@ export default function Recent({ accessToken, title }) {
           .then((res) => {
             setListeningHistory(
               res.data.map((entry) => {
-                return { ...entry, duration: parseInt(entry.duration) };
+                return {
+                  ...entry,
+                  duration: parseInt(entry.duration) / 3600000,
+                };
               })
             );
           });
@@ -105,7 +108,6 @@ export default function Recent({ accessToken, title }) {
 
   useEffect(() => {
     if (!location.accessToken) return;
-    console.log("hit");
     axios
       .get("/api/time-listened-today", {
         params: {
@@ -117,25 +119,30 @@ export default function Recent({ accessToken, title }) {
       });
   }, [location.accessToken]);
 
-  // console.log(timeListenedToday);
-
   useEffect(() => {
     document.title = title;
   }, []);
 
   return (
     <div>
-      {timeListenedToday > 0
+      {/* {timeListenedToday > 0
         ? `${Math.floor(timeListenedToday / 3600000)} hours `
         : null}
       {timeListenedToday > 0
         ? ` ${Math.floor((timeListenedToday / 60000) % 60)} minutes`
-        : null}
+        : null} */}
+
       {listeningHistory.length > 0 ? (
-        <ListeningHistoryChart data={listeningHistory} />
+        <div className="w-[600px]">
+          <span className="font-bold flex justify-center">
+            Listening History
+          </span>
+          <ListeningHistoryChart data={listeningHistory} />
+        </div>
       ) : null}
+      <div className="font-bold mt-4 ml-5">Recently Played</div>
       {recent.length > 0 ? (
-        <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
+        <div className="mt-4 text-center" style={{ whiteSpace: "pre" }}>
           {recent.map((track, index) => {
             return (
               <TrackEntry

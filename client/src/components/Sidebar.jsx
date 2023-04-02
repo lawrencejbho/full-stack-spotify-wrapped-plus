@@ -5,6 +5,7 @@ import StarImg from "../assets/star.png";
 import HeartImg from "../assets/heart.png";
 import SearchImg from "../assets/search.png";
 import HeadphoneImg from "../assets/rounded-headphones.png";
+import ChartImg from "../assets/arrow-chart.png";
 
 export default function Sidebar({ page, accessToken, handleClick }) {
   return (
@@ -43,11 +44,11 @@ export default function Sidebar({ page, accessToken, handleClick }) {
             page={page}
           />
           <SidebarItem
-            image={SearchImg}
+            image={ChartImg}
             handleClick={handleClick}
-            pathname="recent"
+            pathname="listening-history"
             accessToken={accessToken}
-            display="Recent"
+            display="Listening History"
             page={page}
           />
         </aside>

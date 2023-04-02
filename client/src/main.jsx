@@ -7,7 +7,7 @@ import Search from "./pages/Search.jsx";
 import TopTrack from "./pages/TopTrack.jsx";
 import TopArtist from "./pages/TopArtist.jsx";
 import TopGenres from "./pages/TopGenres.jsx";
-import Recent from "./pages/Recent.jsx";
+import ListeningHistory from "./pages/ListeningHistory.jsx";
 
 const router = createBrowserRouter([
   {
@@ -35,8 +35,8 @@ const router = createBrowserRouter([
         element: <TopGenres title="Top Genres | Wrapped Plus" />,
       },
       {
-        path: "recent",
-        element: <Recent title="Recent | Wrapped Plus" />,
+        path: "listening-history",
+        element: <ListeningHistory title="Listening History | Wrapped Plus" />,
       },
     ],
   },
