@@ -114,12 +114,13 @@ app.get("/api/genres", async (req, res) => {
 app.post("/api/artists", async (req, res) => {
   const { artists, genres, duration, userId } = req.body.params;
   let topGenres = [];
+  const currentDate = new Date().toISOString().split("T")[0];
 
   // check if the entry already exists for the specific duration
   try {
     const query = await pool.query(
-      "SELECT * FROM artists WHERE user_id = $1 AND duration = $2",
-      [userId, duration]
+      "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3",
+      [userId, duration, currentDate]
     );
     if (query.rows.length > 0) {
       res.sendStatus(200);
@@ -343,11 +344,12 @@ function sortTopGenres(genres_array) {
     });
   }
 
-  // console.log(counts);
+  console.log(counts);
   // sort the object into an array from smallest to largest
-  const genresSorted = Object.keys(counts).sort(
-    (a, b) => counts[a] - counts[b]
-  );
+  const genresSorted = Object.keys(counts)
+    .sort((a, b) => counts[a] - counts[b])
+    .map((key) => ({ genre: key, occurrence: counts[key] }));
+  console.log(genresSorted);
 
   // get the top 10 and reverse the order
 

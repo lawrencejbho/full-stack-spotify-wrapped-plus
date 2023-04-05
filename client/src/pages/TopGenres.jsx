@@ -5,6 +5,10 @@ import { useOutletContext } from "react-router-dom";
 import TimeSelectNav from "../components/TimeSelectNav.jsx";
 import GenreEntry from "../components/GenreEntry";
 
+import GenresChart from "../components/GenresChart.jsx";
+
+import GenresBarChart from "../components/GenresBarChart.jsx";
+
 export default function TopTrack({ accessToken, title }) {
   const [topGenres, setTopGenres] = useState([]);
   const [timeSelect, setTimeSelect] = useState("short_term");
@@ -17,7 +21,10 @@ export default function TopTrack({ accessToken, title }) {
         params: { userId: location.userId, duration: timeSelect },
       })
       .then((res) => {
-        setTopGenres(res.data);
+        const data = res.data.map((entry) => {
+          return JSON.parse(entry);
+        });
+        setTopGenres(data);
       });
   }, [timeSelect]);
 
@@ -25,21 +32,22 @@ export default function TopTrack({ accessToken, title }) {
     setTimeSelect(duration);
   }
 
+  // console.log(topGenres);
+
   useEffect(() => {
     document.title = title;
   }, []);
   return (
-    <div>
+    <div className="overflow-x-hidden">
+      {topGenres.length > 0 ? (
+        <GenresChart data={topGenres.slice(0, 5)} />
+      ) : null}
+
       {topGenres.length > 0 ? (
         <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
       ) : null}
-      {topGenres.length > 0 ? (
-        <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
-          {topGenres.map((track, index) => {
-            return <GenreEntry genre={track} key={index} index={index + 1} />;
-          })}
-        </div>
-      ) : null}
+
+      {topGenres.length > 0 ? <GenresBarChart data={topGenres} /> : null}
     </div>
   );
 }

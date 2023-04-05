@@ -48,7 +48,7 @@ export default function Dashboard({ code }) {
   }, [accessToken]);
 
   return (
-    <section className="h-screen font-Rubik w-screen">
+    <section className="h-screen font-Rubik w-screen overflow-y-hidden">
       {accessToken ? null : (
         <div className="flex h-[90%] items-center justify-center">
           <RingLoader

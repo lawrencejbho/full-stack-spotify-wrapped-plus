@@ -22,12 +22,13 @@ CREATE TABLE genres(
 CREATE TABLE recent_tracks(
     tracks text[],
     created_at timestamp NOT NULL DEFAULT now(),
+    calendar_date varchar,
     user_id varchar
 );
 
 CREATE TABLE listening_history(
+    calendar_date varchar,
     duration varchar,
-    date_string varchar,
     created_at timestamp NOT NULL DEFAULT now(),
     user_id varchar
 );
