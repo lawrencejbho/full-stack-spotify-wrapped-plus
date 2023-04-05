@@ -32,22 +32,3 @@ CREATE TABLE listening_history(
     created_at timestamp NOT NULL DEFAULT now(),
     user_id varchar
 );
-
-
-
-
--- CREATE Table users(
---   id int [pk, increment] // auto-increment
---   created_at timestamp
--- );
-
-
-
--- CREATE Table tracks {
---   id int
---   country_code int
---   merchant_name varchar
-  
---   created_at timestamp
---   user_id int [ref: > U.id]
--- }
