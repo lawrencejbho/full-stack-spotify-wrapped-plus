@@ -81,6 +81,22 @@ async function getArtists(req, res) {
   }
 }
 
+async function getArtistsRankChange(req, res) {
+  const { userId, duration } = req.query;
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  try {
+    const query = await pool.query(
+      "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3 OR created_at = $4",
+      [userId, duration, currentDate, yesterdayDate()]
+    );
+    const query2 = await pool.query();
+    res.json(query.rows);
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
 async function getTracks(req, res) {
   try {
     const query = await pool.query("SELECT * FROM tracks");
@@ -388,6 +404,8 @@ exports.refreshAccess = refreshAccess;
 exports.loginSpotify = loginSpotify;
 exports.getLyrics = getLyrics;
 exports.getArtists = getArtists;
+exports.getArtistsRankChange = getArtistsRankChange;
+
 exports.getTracks = getTracks;
 exports.getGenres = getGenres;
 exports.getListeningHistory = getListeningHistory;
