@@ -55,21 +55,6 @@ export default function TopArtist({ accessToken, title }) {
     });
   }, [location.accessToken, timeSelect]);
 
-  useEffect(() => {
-    if (topArtists.length < 1) return;
-    let artists_array = topArtists.map((entry) => entry.name);
-    let genres_array = topArtists.map((entry) => entry.genres);
-
-    axios.post("/api/artists", {
-      params: {
-        artists: artists_array,
-        genres: genres_array,
-        duration: timeSelect,
-        userId: location.userId,
-      },
-    });
-  }, [topArtists]);
-
   function changeTime(duration) {
     setTimeSelect(duration);
   }

@@ -1,15 +1,4 @@
 import React from "react";
-import {
-  BarChart,
-  Bar,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 
 export default function GenreEntry({ genre, occurrence, index, total }) {
   const calc = (occurrence * 100) / total;
