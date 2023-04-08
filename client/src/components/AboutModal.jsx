@@ -62,6 +62,8 @@ export default function modal() {
                       account to view your top Artists, Songs, and Genres. You
                       can search for new songs or play your favorites directly
                       in the built in web player that will also show the lyrics.
+                      Unique charts and graph allow you to interact with your
+                      personalized listening information.
                       <br />
                       <br />
                       Made by{" "}

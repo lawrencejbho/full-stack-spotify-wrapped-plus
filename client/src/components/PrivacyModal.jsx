@@ -72,7 +72,11 @@ export default function modal() {
                       <br />
                       user-top-read
                       <br />
-                      playlist-modify-public
+                      user-library-read
+                      <br />
+                      user-read-playback-state
+                      <br />
+                      user-modify-playback-state
                       <br />
                       <br />
                       If at any point you wish to remove Wrapped Plus's
