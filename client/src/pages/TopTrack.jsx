@@ -12,7 +12,7 @@ const spotifyApi = new SpotifyWebApi({
 export default function TopTrack({ accessToken, title }) {
   const location = useOutletContext();
   const [topTracks, setTopTracks] = useState([]);
-  const [timeSelect, setTimeSelect] = useState("long_term");
+  const [timeSelect, setTimeSelect] = useState("short_term");
 
   useEffect(() => {
     if (!location.accessToken) return;
@@ -55,7 +55,6 @@ export default function TopTrack({ accessToken, title }) {
   }, [location.accessToken, timeSelect]);
 
   function changeTime(duration) {
-    console.log("hit");
     setTimeSelect(duration);
   }
 

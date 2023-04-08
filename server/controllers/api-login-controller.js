@@ -97,10 +97,12 @@ async function getArtistsRankChange(req, res) {
       for (let i = 0; i < query.rows[0].artists.length; i++) {
         map.set(query.rows[0].artists[i], i + 1);
       }
-      // console.log(map);
+      console.log(map);
 
       let changeArray = query.rows[1].artists.map((artist, index) => {
+        console.log(map.has(artist));
         if (map.has(artist) == false) {
+          console.log("has");
           return "new";
         } else if (map.get(artist) > index + 1) {
           return "higher";

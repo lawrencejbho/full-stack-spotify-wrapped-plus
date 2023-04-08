@@ -257,7 +257,7 @@ export default function Dashboard({ code }) {
             handleClick={choosePage}
           />
         ) : null}
-        {accessToken ? (
+        {userId !== "" ? (
           <div
             onScroll={handleScroll}
             className="pt-4 w-screen flex-grow h-full items-center justify-center overflow-y-scroll"

@@ -12,13 +12,12 @@ export default function ArtistEntry({
 }) {
   function displayIcon() {
     if (artistChange == "lower") {
-      console.log(artistChange);
       return <TiArrowSortedDown className="text-red-600" />;
     } else if (artistChange == "higher") {
       return <TiArrowSortedUp className="text-green-500" />;
     } else if (artistChange == "same") {
       return <div className="h-4"></div>;
-    } else if ((artistChange = "new")) {
+    } else if (artistChange == "new") {
       return <GoPrimitiveDot className="text-blue-500" />;
     }
   }

@@ -13,7 +13,7 @@ const spotifyApi = new SpotifyWebApi({
 export default function TopArtist({ accessToken, title }) {
   const location = useOutletContext();
   const [topArtists, setTopArtists] = useState([]);
-  const [timeSelect, setTimeSelect] = useState("long_term");
+  const [timeSelect, setTimeSelect] = useState("short_term");
 
   const [artistsChange, setArtistsChange] = useState([]);
 
@@ -24,6 +24,23 @@ export default function TopArtist({ accessToken, title }) {
 
   useEffect(() => {
     if (!location.accessToken) return;
+
+    axios
+      .get("/api/artists-rank-change", {
+        params: {
+          duration: timeSelect,
+          userId: location.userId,
+        },
+      })
+      .then((data) => {
+        if (data.status == 204) {
+          return;
+        } else {
+          console.log(data);
+          setArtistsChange(data.data);
+        }
+      });
+
     spotifyApi.getMyTopArtists({ time_range: timeSelect }).then((data) => {
       // console.log(data.body.items);
       setTopArtists(
@@ -61,24 +78,11 @@ export default function TopArtist({ accessToken, title }) {
     setTimeSelect(duration);
   }
 
-  useEffect(() => {
-    if (!location.userId) return;
-    axios
-      .get("/api/artists-rank-change", {
-        params: {
-          duration: timeSelect,
-          userId: location.userId,
-        },
-      })
-      .then((data) => {
-        if (data.status == 204) {
-          return;
-        } else {
-          console.log(data);
-          setArtistsChange(data.data);
-        }
-      });
-  }, [location.accessToken, timeSelect]);
+  // useEffect(() => {
+  //   if (!location.accessToken) return;
+
+  //   console.log("let's go");
+  // }, [location.accessToken, timeSelect]);
 
   useEffect(() => {
     document.title = title;
