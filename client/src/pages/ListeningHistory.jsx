@@ -106,18 +106,18 @@ export default function ListeningHistory({ accessToken, title }) {
       });
   }, [recent]);
 
-  useEffect(() => {
-    if (!location.accessToken) return;
-    axios
-      .get("/api/time-listened-today", {
-        params: {
-          userId: location.userId,
-        },
-      })
-      .then((res) => {
-        setTimeListenedToday(res.data.duration);
-      });
-  }, [location.accessToken]);
+  // useEffect(() => {
+  //   if (!location.accessToken) return;
+  //   axios
+  //     .get("/api/time-listened-today", {
+  //       params: {
+  //         userId: location.userId,
+  //       },
+  //     })
+  //     .then((res) => {
+  //       setTimeListenedToday(res.data.duration);
+  //     });
+  // }, [location.accessToken]);
 
   useEffect(() => {
     document.title = title;

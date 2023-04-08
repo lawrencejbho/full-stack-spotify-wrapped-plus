@@ -15,8 +15,6 @@ export default function GenresChart({ data }) {
     return <div></div>;
   };
 
-  console.log(data);
-
   return (
     <div className="flex items-center justify-center">
       <div className="text-sm sm:text-lg w-[300px] sm:w-[500px] h-[300px]">

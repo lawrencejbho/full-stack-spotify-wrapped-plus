@@ -1,13 +1,36 @@
 import React from "react";
 
-export default function ArtistEntry({ albumUrl, name, genres, index }) {
+import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
+import { GoPrimitiveDot } from "react-icons/go";
+
+export default function ArtistEntry({
+  albumUrl,
+  name,
+  genres,
+  index,
+  artistChange,
+}) {
+  function displayIcon() {
+    if (artistChange == "lower") {
+      console.log(artistChange);
+      return <TiArrowSortedDown className="text-red-600" />;
+    } else if (artistChange == "higher") {
+      return <TiArrowSortedUp className="text-green-500" />;
+    } else if (artistChange == "same") {
+      return <div className="h-4"></div>;
+    } else if ((artistChange = "new")) {
+      return <GoPrimitiveDot className="text-blue-500" />;
+    }
+  }
+
   return (
     <div
       className="w-screen flex pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6 hover:bg-gray-100"
       key={index}
     >
-      <div className="flex justify-center items-center min-w-[20px]">
+      <div className="flex flex-col justify-center items-center min-w-[20px]">
         {index}
+        {displayIcon()}
       </div>
       <img
         src={albumUrl}

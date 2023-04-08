@@ -15,7 +15,7 @@ CREATE TABLE artists(
 CREATE TABLE genres(
     genres text[10],
     duration varchar,
-    created_at timestamp NOT NULL DEFAULT now(),
+    created_at date NOT NULL DEFAULT CURRENT_DATE,
     user_id varchar
 );
 

@@ -32,8 +32,6 @@ export default function TopTrack({ accessToken, title }) {
     setTimeSelect(duration);
   }
 
-  // console.log(topGenres);
-
   useEffect(() => {
     document.title = title;
   }, []);

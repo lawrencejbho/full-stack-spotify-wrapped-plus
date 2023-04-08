@@ -87,11 +87,34 @@ async function getArtistsRankChange(req, res) {
 
   try {
     const query = await pool.query(
-      "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3 OR created_at = $4",
-      [userId, duration, currentDate, yesterdayDate()]
+      "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND (created_at = $3 OR created_at = $4)",
+      [userId, duration, currentDate, getYesterdayDate()]
     );
-    const query2 = await pool.query();
-    res.json(query.rows);
+
+    // console.log(query.rows);
+    if (query.rows.length > 1) {
+      let map = new Map();
+      for (let i = 0; i < query.rows[0].artists.length; i++) {
+        map.set(query.rows[0].artists[i], i + 1);
+      }
+      // console.log(map);
+
+      let changeArray = query.rows[1].artists.map((artist, index) => {
+        if (map.has(artist) == false) {
+          return "new";
+        } else if (map.get(artist) > index + 1) {
+          return "higher";
+        } else if (map.get(artist) < index + 1) {
+          return "lower";
+        } else {
+          return "same";
+        }
+      });
+      // console.log(changeArray);
+      res.json(changeArray);
+    } else {
+      res.sendStatus(204);
+    }
   } catch (err) {
     console.log(err.message);
   }

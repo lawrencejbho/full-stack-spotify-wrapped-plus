@@ -32,9 +32,11 @@ export default function Dashboard({ code }) {
   const [offsetHeight, setOffsetHeight] = useState(900);
   const [clientHeight, setClientHeight] = useState(0);
 
-  const [timeSelect, setTimeSelect] = useState("");
+  const [artistsTimeSelect, setArtistsTimeSelect] = useState("");
+  const [tracksTimeSelect, setTracksTimeSelect] = useState("");
 
   const [topArtists, setTopArtists] = useState([]);
+  const [topTracks, setTopTracks] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -93,6 +95,39 @@ export default function Dashboard({ code }) {
     retry: false,
   });
 
+  // const getTracksQueryShort = useQuery({
+  //   queryKey: ["tracks_short"],
+  //   queryFn: () => queryTracks("short_term"),
+  //   enabled: userId !== "",
+  //   refetchOnWindowFocus: false,
+  //   staleTime: Infinity,
+  //   refetchOnmount: false,
+  //   refetchOnReconnect: false,
+  //   retry: false,
+  // });
+
+  // const getTracksQueryMedium = useQuery({
+  //   queryKey: ["tracks_short"],
+  //   queryFn: () => queryTracks("medium_term"),
+  //   enabled: userId !== "",
+  //   refetchOnWindowFocus: false,
+  //   staleTime: Infinity,
+  //   refetchOnmount: false,
+  //   refetchOnReconnect: false,
+  //   retry: false,
+  // });
+
+  // const getTracksQueryLong = useQuery({
+  //   queryKey: ["tracks_long"],
+  //   queryFn: () => queryTracks("long_term"),
+  //   enabled: userId !== "",
+  //   refetchOnWindowFocus: false,
+  //   staleTime: Infinity,
+  //   refetchOnmount: false,
+  //   refetchOnReconnect: false,
+  //   retry: false,
+  // });
+
   function queryArtists(duration) {
     spotifyApi.getMyTopArtists({ time_range: duration }).then((data) => {
       setTopArtists(
@@ -117,7 +152,7 @@ export default function Dashboard({ code }) {
           genreString = genreString.replace(/(^\w{1})|(\s+\w{1})/g, (letter) =>
             letter.toUpperCase()
           );
-          setTimeSelect(duration);
+          setArtistsTimeSelect(duration);
           return {
             name: artist.name,
             genres: genreString,
@@ -140,7 +175,7 @@ export default function Dashboard({ code }) {
         params: {
           artists: artists_array,
           genres: genres_array,
-          duration: timeSelect,
+          duration: artistsTimeSelect,
           userId: userId,
         },
       })
@@ -149,6 +184,56 @@ export default function Dashboard({ code }) {
         setLoading(false);
       });
   }, [topArtists]);
+
+  // function queryTracks(duration) {
+  //   spotifyApi.getMyTopTracks({ time_range: duration }).then((data) => {
+  //     // console.log(data.body.items);
+  //     setTopTracks(
+  //       data.body.items.map((track) => {
+  //         const smallestAlbumImage = track.album.images.reduce(
+  //           (smallest, image) => {
+  //             if (image.height < smallest.height) return image;
+  //             return smallest;
+  //           },
+  //           track.album.images[0]
+  //         );
+  //         let artists_string = "";
+  //         track.artists.forEach((artist, index) => {
+  //           if (index + 1 == track.artists.length) {
+  //             return (artists_string += `${artist.name}`);
+  //           } else {
+  //             return (artists_string += `${artist.name}, `);
+  //           }
+  //         });
+  //         setTracksTimeSelect(duration);
+
+  //         return {
+  //           artist: artists_string,
+  //           name: track.name,
+  //           uri: track.uri,
+  //           albumUrl: smallestAlbumImage.url,
+  //         };
+  //       })
+  //     );
+  //   });
+  // }
+
+  // useEffect(() => {
+  //   if (topTracks.length < 1) return;
+  //   let tracks_array = topTracks.map((entry) => entry.name);
+
+  //   axios
+  //     .post("/api/tracks", {
+  //       params: {
+  //         tracks: tracks_array,
+  //         duration: tracksTimeSelect,
+  //         userId: userId,
+  //       },
+  //     })
+  //     .then((data) => {
+  //       // console.log(data);
+  //     });
+  // }, [topArtists]);
 
   return (
     <section className="h-screen font-Rubik w-screen overflow-y-hidden">

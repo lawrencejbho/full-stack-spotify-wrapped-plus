@@ -12,6 +12,10 @@ router.get("/lyrics", apiLoginController.getLyrics);
 
 router.get("/artists", apiLoginController.getArtists);
 
+router.get("/artists", apiLoginController.getArtists);
+
+router.get("/artists-rank-change", apiLoginController.getArtistsRankChange);
+
 router.get("/tracks", apiLoginController.getTracks);
 
 router.get("/genres", apiLoginController.getGenres);

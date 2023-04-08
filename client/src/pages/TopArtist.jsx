@@ -15,6 +15,8 @@ export default function TopArtist({ accessToken, title }) {
   const [topArtists, setTopArtists] = useState([]);
   const [timeSelect, setTimeSelect] = useState("long_term");
 
+  const [artistsChange, setArtistsChange] = useState([]);
+
   useEffect(() => {
     if (!location.accessToken) return;
     spotifyApi.setAccessToken(location.accessToken);
@@ -60,8 +62,28 @@ export default function TopArtist({ accessToken, title }) {
   }
 
   useEffect(() => {
+    if (!location.userId) return;
+    axios
+      .get("/api/artists-rank-change", {
+        params: {
+          duration: timeSelect,
+          userId: location.userId,
+        },
+      })
+      .then((data) => {
+        if (data.status == 204) {
+          return;
+        } else {
+          console.log(data);
+          setArtistsChange(data.data);
+        }
+      });
+  }, [location.accessToken, timeSelect]);
+
+  useEffect(() => {
     document.title = title;
   }, []);
+
   return (
     <div className="overflow-x-hidden">
       {topArtists.length > 0 ? (
@@ -76,7 +98,9 @@ export default function TopArtist({ accessToken, title }) {
                 albumUrl={artist.albumUrl}
                 name={artist.name}
                 genres={artist.genres}
+                artistChange={artistsChange[index]}
                 index={index + 1}
+                key={index}
               />
             );
           })}
