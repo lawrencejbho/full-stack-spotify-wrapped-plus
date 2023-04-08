@@ -18,11 +18,15 @@ router.get("/artists-rank-change", apiLoginController.getArtistsRankChange);
 
 router.get("/tracks", apiLoginController.getTracks);
 
+router.get("/tracks-rank-change", apiLoginController.getTracksRankChange);
+
 router.get("/genres", apiLoginController.getGenres);
 
 router.get("/listening-history", apiLoginController.getListeningHistory);
 
 router.post("/artists", apiLoginController.addArtists);
+
+router.post("/tracks", apiLoginController.createTracks);
 
 router.post("/recent-tracks", apiLoginController.addRecentTracks);
 

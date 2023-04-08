@@ -10,7 +10,6 @@ export default function TimeSelect({ timeSelect, handleClick }) {
         handleClick={handleClick}
         display="This month"
       />
-
       <TimeSelectItem
         timeSelect={timeSelect}
         duration="medium_term"

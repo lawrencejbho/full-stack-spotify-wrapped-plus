@@ -11,6 +11,16 @@ CREATE TABLE artists(
     user_id varchar
 );
 
+CREATE TABLE tracks(
+    tracks text[20],
+    duration varchar,
+    created_at date NOT NULL DEFAULT CURRENT_DATE,
+    user_id varchar
+
+
+
+    
+);
 
 CREATE TABLE genres(
     genres text[10],

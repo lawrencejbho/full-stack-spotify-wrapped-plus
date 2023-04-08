@@ -1,5 +1,8 @@
 import React from "react";
 
+import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
+import { GoPrimitiveDot } from "react-icons/go";
+
 export default function Top({
   name,
   artist,
@@ -7,9 +10,22 @@ export default function Top({
   chooseTrack,
   track,
   index,
+  tracksChange,
 }) {
   function handlePlay() {
     chooseTrack(track);
+  }
+
+  function displayIcon() {
+    if (tracksChange == "lower") {
+      return <TiArrowSortedDown className="text-red-600" />;
+    } else if (tracksChange == "higher") {
+      return <TiArrowSortedUp className="text-green-500" />;
+    } else if (tracksChange == "same") {
+      return <div className="h-4"></div>;
+    } else if (tracksChange == "new") {
+      return <GoPrimitiveDot className="text-blue-500" />;
+    }
   }
 
   return (
@@ -18,8 +34,9 @@ export default function Top({
       className="flex pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6  hover:bg-gray-100"
       key={index}
     >
-      <div className="flex justify-center items-center min-w-[20px]">
+      <div className="flex flex-col justify-center items-center min-w-[20px]">
         {index}
+        {displayIcon()}
       </div>
       <img
         src={albumUrl}

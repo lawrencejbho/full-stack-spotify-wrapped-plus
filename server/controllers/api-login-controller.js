@@ -97,12 +97,10 @@ async function getArtistsRankChange(req, res) {
       for (let i = 0; i < query.rows[0].artists.length; i++) {
         map.set(query.rows[0].artists[i], i + 1);
       }
-      console.log(map);
+      // console.log(map);
 
       let changeArray = query.rows[1].artists.map((artist, index) => {
-        console.log(map.has(artist));
         if (map.has(artist) == false) {
-          console.log("has");
           return "new";
         } else if (map.get(artist) > index + 1) {
           return "higher";
@@ -126,6 +124,45 @@ async function getTracks(req, res) {
   try {
     const query = await pool.query("SELECT * FROM tracks");
     res.json(query.rows[query.rows.length - 1].artists);
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
+async function getTracksRankChange(req, res) {
+  const { userId, duration } = req.query;
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  try {
+    const query = await pool.query(
+      "SELECT * FROM tracks WHERE user_id = $1 AND duration = $2 AND (created_at = $3 OR created_at = $4)",
+      [userId, duration, currentDate, getYesterdayDate()]
+    );
+
+    // console.log(query.rows);
+    if (query.rows.length > 1) {
+      let map = new Map();
+      for (let i = 0; i < query.rows[0].tracks.length; i++) {
+        map.set(query.rows[0].tracks[i], i + 1);
+      }
+      // console.log(map);
+
+      let changeArray = query.rows[1].tracks.map((tracks, index) => {
+        if (map.has(tracks) == false) {
+          return "new";
+        } else if (map.get(track) > index + 1) {
+          return "higher";
+        } else if (map.get(track) < index + 1) {
+          return "lower";
+        } else {
+          return "same";
+        }
+      });
+      // console.log(changeArray);
+      res.json(changeArray);
+    } else {
+      res.sendStatus(204);
+    }
   } catch (err) {
     console.log(err.message);
   }
@@ -366,6 +403,38 @@ async function addRecentTracks(req, res) {
   }
 }
 
+async function createTracks(req, res) {
+  const { tracks, duration, userId } = req.body.params;
+  const currentDate = new Date().toISOString().split("T")[0];
+
+  // check if the entry already exists for the specific duration
+  try {
+    const query = await pool.query(
+      "SELECT * FROM tracks WHERE user_id = $1 AND duration = $2 AND created_at = $3",
+      [userId, duration, currentDate]
+    );
+    // console.log(query.rows);
+    if (query.rows.length > 0) {
+      res.sendStatus(200);
+      return;
+    }
+  } catch (err) {
+    console.log(err.message);
+  }
+
+  // insert into artists table
+  try {
+    console.log("adding to tracks table");
+    const query = await pool.query(
+      "INSERT INTO tracks(tracks, user_id, duration,created_at) VALUES ($1, $2, $3, $4) RETURNING *",
+      [tracks, userId, duration, currentDate]
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
 function sortTopGenres(genres_array) {
   // count occurrences of each genres using a map
   let counts = {};
@@ -432,7 +501,11 @@ exports.getArtists = getArtists;
 exports.getArtistsRankChange = getArtistsRankChange;
 
 exports.getTracks = getTracks;
+exports.getTracksRankChange = getTracksRankChange;
+
 exports.getGenres = getGenres;
 exports.getListeningHistory = getListeningHistory;
+
 exports.addArtists = createArtists;
 exports.addRecentTracks = addRecentTracks;
+exports.createTracks = createTracks;

@@ -36,7 +36,7 @@ export default function TopArtist({ accessToken, title }) {
         if (data.status == 204) {
           return;
         } else {
-          console.log(data);
+          // console.log(data);
           setArtistsChange(data.data);
         }
       });
@@ -77,12 +77,6 @@ export default function TopArtist({ accessToken, title }) {
   function changeTime(duration) {
     setTimeSelect(duration);
   }
-
-  // useEffect(() => {
-  //   if (!location.accessToken) return;
-
-  //   console.log("let's go");
-  // }, [location.accessToken, timeSelect]);
 
   useEffect(() => {
     document.title = title;

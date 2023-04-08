@@ -5,6 +5,8 @@ import SpotifyWebApi from "spotify-web-api-node";
 import TrackEntry from "../components/TrackEntry.jsx";
 import TimeSelectNav from "../components/TimeSelectNav.jsx";
 
+import axios from "axios";
+
 const spotifyApi = new SpotifyWebApi({
   clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
 });
@@ -14,6 +16,8 @@ export default function TopTrack({ accessToken, title }) {
   const [topTracks, setTopTracks] = useState([]);
   const [timeSelect, setTimeSelect] = useState("short_term");
 
+  const [tracksChange, setTracksChange] = useState([]);
+
   useEffect(() => {
     if (!location.accessToken) return;
     spotifyApi.setAccessToken(location.accessToken);
@@ -22,6 +26,22 @@ export default function TopTrack({ accessToken, title }) {
   // need to update the scope to get top
   useEffect(() => {
     if (!location.accessToken) return;
+
+    axios
+      .get("/api/tracks-rank-change", {
+        params: {
+          duration: timeSelect,
+          userId: location.userId,
+        },
+      })
+      .then((data) => {
+        if (data.status == 204) {
+          return;
+        } else {
+          console.log(data);
+          setTracksChange(data.data);
+        }
+      });
 
     spotifyApi.getMyTopTracks({ time_range: timeSelect }).then((data) => {
       // console.log(data.body.items);
@@ -79,6 +99,7 @@ export default function TopTrack({ accessToken, title }) {
                 chooseTrack={location.chooseTrack}
                 key={index}
                 index={index + 1}
+                tracksChange={tracksChange[index]}
               />
             );
           })}
