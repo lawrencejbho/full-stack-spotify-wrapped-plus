@@ -144,7 +144,7 @@ async function getArtists(req, res) {
 
       res.json(query.rows);
       await client.set(redisKey, JSON.stringify(query.rows), {
-        EX: 30,
+        EX: 7200,
       });
     }
   } catch (err) {
@@ -196,7 +196,7 @@ async function getArtistsRankChange(req, res) {
         // console.log(changeArray);
         res.json(changeArray);
         await client.set(redisKey, JSON.stringify(changeArray), {
-          EX: 30,
+          EX: 7200,
         });
       } else {
         res.sendStatus(204);
