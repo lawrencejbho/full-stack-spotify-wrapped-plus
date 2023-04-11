@@ -10,16 +10,16 @@ const pool = require("../db.js");
 let client;
 
 (async () => {
+  const url = `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`;
+
   client = redis.createClient({
-    host: "localhost",
-    port: 6379,
-    password: "password",
+    url,
+    password: process.env.REDIS_PASSWORD,
   });
 
   client.on("error", (err) => console.log("Redis Client Error", err));
 
   await client.connect();
-  await pool.connect();
 })();
 
 function cache(req, res, next) {
@@ -50,7 +50,7 @@ async function test2(req, res) {
       JSON.stringify({ method: req.method, url: req.url }),
       JSON.stringify({ res: "test2" }),
       {
-        EX: 3,
+        EX: 30,
       }
     );
     res.json({ res: "complete" });
@@ -119,6 +119,7 @@ async function getLyrics(req, res) {
 
 async function getArtists(req, res) {
   const { userId, duration } = req.query;
+  // console.log(userId);
   const currentDate = new Date().toISOString().split("T")[0];
 
   const redisKey = JSON.stringify({
@@ -130,11 +131,12 @@ async function getArtists(req, res) {
 
   try {
     const cacheResults = await client.get(redisKey);
+    console.log(cacheResults);
     if (cacheResults) {
       const obj = JSON.parse(cacheResults);
       res.json(obj);
     } else {
-      // console.log("talking to database");
+      console.log("talking to database");
       const query = await pool.query(
         "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3",
         [userId, duration, currentDate]
