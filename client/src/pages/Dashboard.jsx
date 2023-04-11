@@ -267,14 +267,14 @@ export default function Dashboard({ code }) {
       )}
 
       <div className="flex h-[89%] w-auto">
-        {accessToken ? (
+        {!loading ? (
           <SideBar
             accessToken={accessToken}
             page={page}
             handleClick={choosePage}
           />
         ) : null}
-        {userId !== "" ? (
+        {!loading ? (
           <div
             onScroll={handleScroll}
             className="pt-4 w-screen flex-grow h-full items-center justify-center overflow-y-scroll"

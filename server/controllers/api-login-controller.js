@@ -118,7 +118,7 @@ async function getArtists(req, res) {
     });
     const cacheResults = await client.get(redisKey);
     // console.log(cacheResults);
-    if (cacheResults) {
+    if (cacheResults && cacheResults.length !== 0) {
       const obj = JSON.parse(cacheResults);
       res.json(obj);
     } else {
@@ -127,6 +127,7 @@ async function getArtists(req, res) {
         "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3",
         [userId, duration, getCurrentDate()]
       );
+      console.log(query.rows);
 
       res.json(query.rows);
       await client.set(redisKey, JSON.stringify(query.rows), {
@@ -297,8 +298,9 @@ async function getGenres(req, res) {
         "SELECT * FROM genres WHERE user_id = $1 AND duration = $2 AND created_at = $3",
         [userId, duration, getCurrentDate()]
       );
+      // console.log(query.rows[0]);
       res.json(query.rows[0]);
-      await client.set(redisKey, JSON.stringify(query.rows), {
+      await client.set(redisKey, JSON.stringify(query.rows[0]), {
         EX: 7200,
       });
     }
