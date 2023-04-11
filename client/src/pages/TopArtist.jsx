@@ -83,7 +83,7 @@ export default function TopArtist({ accessToken, title }) {
       .then((data) => {
         setTopArtists(data.data[0]);
       });
-  }, [location.accessToken, timeSelect]);
+  }, [location.userId, timeSelect]);
 
   function changeTime(duration) {
     setTimeSelect(duration);
