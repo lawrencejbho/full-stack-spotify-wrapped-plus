@@ -21,7 +21,7 @@ export default function TopTrack({ accessToken, title }) {
         params: { userId: location.userId, duration: timeSelect },
       })
       .then((res) => {
-        const data = res.data.map((entry) => {
+        const data = res.data[0].genres.map((entry) => {
           return JSON.parse(entry);
         });
         setTopGenres(data);

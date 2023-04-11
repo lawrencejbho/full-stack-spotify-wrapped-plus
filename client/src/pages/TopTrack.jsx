@@ -43,38 +43,18 @@ export default function TopTrack({ accessToken, title }) {
         }
       });
 
-    spotifyApi.getMyTopTracks({ time_range: timeSelect }).then((data) => {
-      // console.log(data.body.items);
-      setTopTracks(
-        data.body.items.map((track) => {
-          const smallestAlbumImage = track.album.images.reduce(
-            (smallest, image) => {
-              if (image.height < smallest.height) return image;
-              return smallest;
-            },
-            track.album.images[0]
-          );
-          let artists_string = "";
-          track.artists.forEach((artist, index) => {
-            if (index + 1 == track.artists.length) {
-              return (artists_string += `${artist.name}`);
-            } else {
-              return (artists_string += `${artist.name}, `);
-            }
-          });
-
-          return {
-            artist: artists_string,
-            name: track.name,
-            uri: track.uri,
-            albumUrl: smallestAlbumImage.url,
-          };
-        })
-      );
-    });
+    axios
+      .get("/api/tracks", {
+        params: {
+          duration: timeSelect,
+          userId: location.userId,
+        },
+      })
+      .then((data) => {
+        // console.log(data.data[0]);
+        setTopTracks(data.data[0]);
+      });
   }, [location.accessToken, timeSelect]);
-
-  console.log();
 
   function changeTime(duration) {
     setTimeSelect(duration);
@@ -86,18 +66,18 @@ export default function TopTrack({ accessToken, title }) {
 
   return (
     <div>
-      {topTracks.length > 0 ? (
+      {topTracks?.tracks?.length > 0 ? (
         <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
       ) : null}
-      {topTracks.length > 0 ? (
+      {topTracks?.tracks?.length > 0 ? (
         <div className="mt-12 text-center" style={{ whiteSpace: "pre" }}>
-          {topTracks.map((track, index) => {
+          {topTracks.tracks.map((track, index) => {
             return (
               <TrackEntry
-                track={track}
-                name={track.name}
-                artist={track.artist}
-                albumUrl={track.albumUrl}
+                track={topTracks.uris[index]}
+                name={track}
+                artist={topTracks.artists[index]}
+                albumUrl={topTracks.albums[index]}
                 chooseTrack={location.chooseTrack}
                 key={index}
                 index={index + 1}

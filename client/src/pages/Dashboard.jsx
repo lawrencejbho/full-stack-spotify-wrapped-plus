@@ -224,12 +224,25 @@ export default function Dashboard({ code }) {
 
   useEffect(() => {
     if (topTracks.length < 1) return;
-    let tracks_array = topTracks.map((entry) => entry.name);
+    let tracks_array = [];
+    let artists_array = [];
+    let uris_array = [];
+    let albums_array = [];
+
+    topTracks.forEach((entry) => {
+      tracks_array.push(entry.name);
+      artists_array.push(entry.artist);
+      uris_array.push(entry.uri);
+      albums_array.push(entry.albumUrl);
+    });
 
     axios
       .post("/api/tracks", {
         params: {
           tracks: tracks_array,
+          artists: artists_array,
+          uris: uris_array,
+          albums: albums_array,
           duration: tracksTimeSelect,
           userId: userId,
         },
@@ -281,7 +294,10 @@ export default function Dashboard({ code }) {
       </div>
 
       <footer className="sticky bottom-0">
-        <Player accessToken={accessToken} trackUri={playingTrack?.uri} />
+        <Player
+          accessToken={accessToken}
+          trackUri={playingTrack?.uri ? playingTrack?.uri : playingTrack}
+        />
       </footer>
     </section>
   );

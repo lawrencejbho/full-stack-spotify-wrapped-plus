@@ -123,6 +123,8 @@ export default function ListeningHistory({ accessToken, title }) {
     document.title = title;
   }, []);
 
+  console.log(recent);
+
   return (
     <div>
       {/* {timeListenedToday > 0
