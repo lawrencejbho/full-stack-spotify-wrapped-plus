@@ -12,7 +12,7 @@ const spotifyApi = new SpotifyWebApi({
 
 export default function TopArtist({ accessToken, title }) {
   const location = useOutletContext();
-  const [topArtists, setTopArtists] = useState([]);
+  const [topArtists, setTopArtists] = useState({});
   const [timeSelect, setTimeSelect] = useState("short_term");
 
   const [artistsChange, setArtistsChange] = useState([]);
@@ -41,37 +41,48 @@ export default function TopArtist({ accessToken, title }) {
         }
       });
 
-    spotifyApi.getMyTopArtists({ time_range: timeSelect }).then((data) => {
-      // console.log(data.body.items);
-      setTopArtists(
-        data.body.items.map((artist) => {
-          // albums images aren't guaranteed to be ordered by size so use reduce
-          const smallestArtistImage = artist.images.reduce(
-            (smallest, image) => {
-              if (image.height < smallest.height) return image;
-              return smallest;
-            },
-            artist.images[0]
-          );
-          let genreString = "";
-          const firstThreeGenres = artist.genres.forEach((genre, index) => {
-            if (index < 3) {
-              genreString += `${genre}, `;
-            }
-          });
-          genreString = genreString.substring(0, genreString.length - 2);
-          // this will capitalize each word
-          genreString = genreString.replace(/(^\w{1})|(\s+\w{1})/g, (letter) =>
-            letter.toUpperCase()
-          );
-          return {
-            name: artist.name,
-            genres: genreString,
-            albumUrl: smallestArtistImage.url,
-          };
-        })
-      );
-    });
+    // spotifyApi.getMyTopArtists({ time_range: timeSelect }).then((data) => {
+    //   // console.log(data.body.items);
+    //   setTopArtists(
+    //     data.body.items.map((artist) => {
+    //       // albums images aren't guaranteed to be ordered by size so use reduce
+    //       const smallestArtistImage = artist.images.reduce(
+    //         (smallest, image) => {
+    //           if (image.height < smallest.height) return image;
+    //           return smallest;
+    //         },
+    //         artist.images[0]
+    //       );
+    //       let genreString = "";
+    //       const firstThreeGenres = artist.genres.forEach((genre, index) => {
+    //         if (index < 3) {
+    //           genreString += `${genre}, `;
+    //         }
+    //       });
+    //       genreString = genreString.substring(0, genreString.length - 2);
+    //       // this will capitalize each word
+    //       genreString = genreString.replace(/(^\w{1})|(\s+\w{1})/g, (letter) =>
+    //         letter.toUpperCase()
+    //       );
+    //       return {
+    //         name: artist.name,
+    //         genres: genreString,
+    //         albumUrl: smallestArtistImage.url,
+    //       };
+    //     })
+    //   );
+    // });
+
+    axios
+      .get("/api/artists", {
+        params: {
+          duration: timeSelect,
+          userId: location.userId,
+        },
+      })
+      .then((data) => {
+        setTopArtists(data.data[0]);
+      });
   }, [location.accessToken, timeSelect]);
 
   function changeTime(duration) {
@@ -84,18 +95,18 @@ export default function TopArtist({ accessToken, title }) {
 
   return (
     <div className="overflow-x-hidden">
-      {topArtists.length > 0 ? (
+      {topArtists?.artists?.length > 0 ? (
         <TimeSelectNav timeSelect={timeSelect} handleClick={changeTime} />
       ) : null}
 
-      {topArtists.length > 0 ? (
+      {topArtists?.artists?.length > 0 ? (
         <div className="mt-12" style={{ whiteSpace: "pre" }}>
-          {topArtists.map((artist, index) => {
+          {topArtists.artists.map((artist, index) => {
             return (
               <ArtistEntry
-                albumUrl={artist.albumUrl}
-                name={artist.name}
-                genres={artist.genres}
+                albumUrl={topArtists.albums[index]}
+                name={artist}
+                genres={topArtists.genres[index]}
                 artistChange={artistsChange[index]}
                 index={index + 1}
                 key={index}

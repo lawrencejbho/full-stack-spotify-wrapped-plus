@@ -4,6 +4,8 @@ const apiLoginController = require("../controllers/api-login-controller");
 
 const router = express.Router();
 
+router.get("/test2", apiLoginController.test2);
+
 router.post("/refresh", apiLoginController.refreshAccess);
 
 router.post("/login", apiLoginController.loginSpotify);

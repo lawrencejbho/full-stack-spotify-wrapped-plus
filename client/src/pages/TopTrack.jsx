@@ -38,7 +38,7 @@ export default function TopTrack({ accessToken, title }) {
         if (data.status == 204) {
           return;
         } else {
-          console.log(data);
+          // console.log(data);
           setTracksChange(data.data);
         }
       });
@@ -73,6 +73,8 @@ export default function TopTrack({ accessToken, title }) {
       );
     });
   }, [location.accessToken, timeSelect]);
+
+  console.log();
 
   function changeTime(duration) {
     setTimeSelect(duration);

@@ -1,10 +1,61 @@
 require("dotenv").config();
 const cors = require("cors");
+const redis = require("redis");
 
 const SpotifyWebApi = require("spotify-web-api-node");
 const lyricsFinder = require("lyrics-finder");
 
 const pool = require("../db.js");
+
+let client;
+
+(async () => {
+  client = redis.createClient({
+    host: "localhost",
+    port: 6379,
+    password: "password",
+  });
+
+  client.on("error", (err) => console.log("Redis Client Error", err));
+
+  await client.connect();
+  await pool.connect();
+})();
+
+function cache(req, res, next) {
+  const username = req.params(USER_NAME);
+
+  client.get(username, (err, data) => {
+    if (err) throw err;
+    if (data !== null) {
+      res.send(formatOutput(username, data));
+    } else {
+      next();
+    }
+  });
+}
+
+async function test2(req, res) {
+  const { userId, duration } = req.query;
+  const value = await client.get(
+    JSON.stringify({ method: req.method, url: req.url })
+  );
+  const obj = JSON.parse(value);
+  if (obj !== null) {
+    console.log(obj);
+
+    res.send(obj);
+  } else {
+    await client.set(
+      JSON.stringify({ method: req.method, url: req.url }),
+      JSON.stringify({ res: "test2" }),
+      {
+        EX: 3,
+      }
+    );
+    res.json({ res: "complete" });
+  }
+}
 
 function refreshAccess(req, res) {
   //   console.log(req);
@@ -19,7 +70,7 @@ function refreshAccess(req, res) {
   spotifyApi
     .refreshAccessToken()
     .then((data) => {
-      console.log(data.body);
+      // console.log(data.body);
     })
     .catch(() => {
       res.sendStatus(400);
@@ -70,12 +121,30 @@ async function getArtists(req, res) {
   const { userId, duration } = req.query;
   const currentDate = new Date().toISOString().split("T")[0];
 
+  const redisKey = JSON.stringify({
+    url: req.url,
+    method: req.method,
+    userId: userId,
+    duration: duration,
+  });
+
   try {
-    const query = await pool.query(
-      "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3",
-      [userId, duration, currentDate]
-    );
-    res.json(query.rows);
+    const cacheResults = await client.get(redisKey);
+    if (cacheResults) {
+      const obj = JSON.parse(cacheResults);
+      res.json(obj);
+    } else {
+      // console.log("talking to database");
+      const query = await pool.query(
+        "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3",
+        [userId, duration, currentDate]
+      );
+
+      res.json(query.rows);
+      await client.set(redisKey, JSON.stringify(query.rows), {
+        EX: 30,
+      });
+    }
   } catch (err) {
     console.log(err.message);
   }
@@ -83,37 +152,53 @@ async function getArtists(req, res) {
 
 async function getArtistsRankChange(req, res) {
   const { userId, duration } = req.query;
-  const currentDate = new Date().toISOString().split("T")[0];
 
   try {
-    const query = await pool.query(
-      "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND (created_at = $3 OR created_at = $4)",
-      [userId, duration, currentDate, getYesterdayDate()]
-    );
-
-    // console.log(query.rows);
-    if (query.rows.length > 1) {
-      let map = new Map();
-      for (let i = 0; i < query.rows[0].artists.length; i++) {
-        map.set(query.rows[0].artists[i], i + 1);
-      }
-      // console.log(map);
-
-      let changeArray = query.rows[1].artists.map((artist, index) => {
-        if (map.has(artist) == false) {
-          return "new";
-        } else if (map.get(artist) > index + 1) {
-          return "higher";
-        } else if (map.get(artist) < index + 1) {
-          return "lower";
-        } else {
-          return "same";
-        }
-      });
-      // console.log(changeArray);
-      res.json(changeArray);
+    const redisKey = JSON.stringify({
+      url: req.url,
+      method: req.method,
+      userId: userId,
+      duration: duration,
+    });
+    const cacheResults = await client.get(redisKey);
+    if (cacheResults) {
+      const obj = JSON.parse(cacheResults);
+      res.json(obj);
     } else {
-      res.sendStatus(204);
+      const currentDate = new Date().toISOString().split("T")[0];
+
+      const query = await pool.query(
+        "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 ORDER BY created_at DESC LIMIT 2",
+        [userId, duration]
+      );
+
+      // console.log(query.rows);
+      if (query.rows.length > 1) {
+        let map = new Map();
+        for (let i = 0; i < query.rows[1].artists.length; i++) {
+          map.set(query.rows[1].artists[i], i + 1);
+        }
+        // console.log(map);
+
+        let changeArray = query.rows[0].artists.map((artist, index) => {
+          if (map.has(artist) == false) {
+            return "new";
+          } else if (map.get(artist) > index + 1) {
+            return "higher";
+          } else if (map.get(artist) < index + 1) {
+            return "lower";
+          } else {
+            return "same";
+          }
+        });
+        // console.log(changeArray);
+        res.json(changeArray);
+        await client.set(redisKey, JSON.stringify(changeArray), {
+          EX: 30,
+        });
+      } else {
+        res.sendStatus(204);
+      }
     }
   } catch (err) {
     console.log(err.message);
@@ -135,24 +220,24 @@ async function getTracksRankChange(req, res) {
 
   try {
     const query = await pool.query(
-      "SELECT * FROM tracks WHERE user_id = $1 AND duration = $2 AND (created_at = $3 OR created_at = $4)",
-      [userId, duration, currentDate, getYesterdayDate()]
+      "SELECT * FROM tracks WHERE user_id = $1 AND duration = $2 ORDER BY created_at DESC LIMIT 2",
+      [userId, duration]
     );
 
     // console.log(query.rows);
     if (query.rows.length > 1) {
       let map = new Map();
-      for (let i = 0; i < query.rows[0].tracks.length; i++) {
-        map.set(query.rows[0].tracks[i], i + 1);
+      for (let i = 0; i < query.rows[1].tracks.length; i++) {
+        map.set(query.rows[1].tracks[i], i + 1);
       }
       // console.log(map);
 
-      let changeArray = query.rows[1].tracks.map((tracks, index) => {
+      let changeArray = query.rows[0].tracks.map((tracks, index) => {
         if (map.has(tracks) == false) {
           return "new";
-        } else if (map.get(track) > index + 1) {
+        } else if (map.get(tracks) > index + 1) {
           return "higher";
-        } else if (map.get(track) < index + 1) {
+        } else if (map.get(tracks) < index + 1) {
           return "lower";
         } else {
           return "same";
@@ -216,14 +301,14 @@ async function getListeningHistory(req, res) {
       [userId]
     );
 
-    console.log(listeningHistoryQuery.rows);
+    // console.log(listeningHistoryQuery.rows);
 
     res.json(listeningHistoryQuery.rows);
 
     // even if we send a res, we can now
     // go through yesterday's tracks and figure out what the final number is then add it to listening history database
 
-    console.log("listening history");
+    // console.log("listening history");
 
     const recentTracksQuery = await pool.query(
       "SELECT tracks FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
@@ -256,10 +341,10 @@ async function getListeningHistory(req, res) {
     }
 
     if (total > 0) {
-      console.log(total);
+      // console.log(total);
       updateDatabase(total, getYesterdayDate());
       deleteYesterdayEntries(getYesterdayDate());
-      console.log("deleted tracks");
+      // console.log("deleted tracks");
     }
   } catch (error) {
     console.log(error.message);
@@ -267,7 +352,7 @@ async function getListeningHistory(req, res) {
 }
 
 async function createArtists(req, res) {
-  const { artists, genres, duration, userId } = req.body.params;
+  const { artists, genres, albums, duration, userId } = req.body.params;
   let topGenres = [];
   const currentDate = new Date().toISOString().split("T")[0];
 
@@ -288,10 +373,10 @@ async function createArtists(req, res) {
 
   // insert into artists table
   try {
-    console.log("adding to artists table");
+    // console.log("adding to artists table");
     const query = await pool.query(
-      "INSERT INTO artists(artists, genres, user_id, duration,created_at) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [artists, genres, userId, duration, currentDate]
+      "INSERT INTO artists(artists, genres, albums, user_id, duration,created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [artists, genres, albums, userId, duration, currentDate]
     );
     topGenres = sortTopGenres(query.rows[0].genres);
   } catch (err) {
@@ -322,8 +407,8 @@ async function addRecentTracks(req, res) {
       "SELECT * FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2 ORDER BY created_at DESC LIMIT 1",
       [userId, currentDate]
     );
-    console.log("latest track from today");
-    console.log(query.rows[0]);
+    // console.log("latest track from today");
+    // console.log(query.rows[0]);
 
     const listeningHistoryQuery = await pool.query(
       "SELECT duration, calendar_date FROM listening_history WHERE user_id = $1 AND calendar_date = $2",
@@ -337,10 +422,10 @@ async function addRecentTracks(req, res) {
         "SELECT * FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2 ORDER BY created_at DESC LIMIT 1",
         [userId, getYesterdayDate()]
       );
-      console.log("latest track from yesterday");
-      console.log(query2.rows[0]);
+      // console.log("latest track from yesterday");
+      // console.log(query2.rows[0]);
     } else {
-      console.log("already have listening history for yesterday");
+      // console.log("already have listening history for yesterday");
     }
 
     // there can be multiple tracks per entry
@@ -361,10 +446,10 @@ async function addRecentTracks(req, res) {
       const latestLength = query.rows[0].tracks.length;
       // console.log("length" + length);
       const latestEntry = JSON.parse(query.rows[0].tracks[latestLength - 1]);
-      console.log("latest entry date " + latestEntry.date);
+      // console.log("latest entry date " + latestEntry.date);
 
       let latestDate = query.rows[0].calendar_date;
-      console.log(latestDate);
+      // console.log(latestDate);
       let latestTimestamp = convertToTimestamp(latestEntry.date);
       for (let i = recent_tracks.length - 1; i >= 0; i--) {
         if (recent_tracks[i].date.slice(0, 10) == latestDate) {
@@ -384,8 +469,8 @@ async function addRecentTracks(req, res) {
   } catch (err) {
     console.log(err.message);
   } finally {
-    console.log("todayUpdate " + todayUpdate.length);
-    console.log("yesterdayUpdate " + yesterdayUpdate.length);
+    // console.log("todayUpdate " + todayUpdate.length);
+    // console.log("yesterdayUpdate " + yesterdayUpdate.length);
     // create a new entry anytime there's an update
 
     async function updateDatabase(updateArray, date) {
@@ -424,7 +509,7 @@ async function createTracks(req, res) {
 
   // insert into artists table
   try {
-    console.log("adding to tracks table");
+    // console.log("adding to tracks table");
     const query = await pool.query(
       "INSERT INTO tracks(tracks, user_id, duration,created_at) VALUES ($1, $2, $3, $4) RETURNING *",
       [tracks, userId, duration, currentDate]
@@ -509,3 +594,5 @@ exports.getListeningHistory = getListeningHistory;
 exports.addArtists = createArtists;
 exports.addRecentTracks = addRecentTracks;
 exports.createTracks = createTracks;
+
+exports.test2 = test2;

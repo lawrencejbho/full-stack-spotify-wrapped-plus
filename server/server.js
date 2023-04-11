@@ -10,6 +10,8 @@ const apiRoutes = require("./routes/api-routes.js");
 const app = express();
 const pool = require("./db.js");
 
+app.disable("etag");
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

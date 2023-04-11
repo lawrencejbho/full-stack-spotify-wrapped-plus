@@ -161,7 +161,6 @@ export default function Dashboard({ code }) {
         })
       );
     });
-
     return topArtists;
   }
 
@@ -169,12 +168,15 @@ export default function Dashboard({ code }) {
     if (topArtists.length < 1) return;
     let artists_array = topArtists.map((entry) => entry.name);
     let genres_array = topArtists.map((entry) => entry.genres);
+    let albums_array = topArtists.map((entry) => entry.albumUrl);
+    // console.log(albums_array);
 
     axios
       .post("/api/artists", {
         params: {
           artists: artists_array,
           genres: genres_array,
+          albums: albums_array,
           duration: artistsTimeSelect,
           userId: userId,
         },
@@ -216,6 +218,8 @@ export default function Dashboard({ code }) {
         })
       );
     });
+
+    return topTracks;
   }
 
   useEffect(() => {
