@@ -27,6 +27,7 @@ export default function Dashboard({ code }) {
   const [playingTrack, setPlayingTrack] = useState();
   const [page, setPage] = useState("top-artists");
   const [userId, setUserId] = useState("");
+  const [premium, setPremium] = useState(false);
 
   const [scrollTop, setScrollTop] = useState(0);
   const [offsetHeight, setOffsetHeight] = useState(900);
@@ -59,7 +60,12 @@ export default function Dashboard({ code }) {
   useEffect(() => {
     if (!accessToken) return;
     spotifyApi.setAccessToken(accessToken);
-    spotifyApi.getMe().then((res) => setUserId(res.body.id));
+    spotifyApi.getMe().then((res) => {
+      if (res.body.product == "premium") {
+        setPremium(true);
+      }
+      setUserId(res.body.id);
+    });
   }, [accessToken]);
 
   const getArtistsQueryShort = useQuery({
@@ -293,12 +299,14 @@ export default function Dashboard({ code }) {
         ) : null}
       </div>
 
-      <footer className="sticky bottom-0">
-        <Player
-          accessToken={accessToken}
-          trackUri={playingTrack?.uri ? playingTrack?.uri : playingTrack}
-        />
-      </footer>
+      {premium ? (
+        <footer className="sticky bottom-0">
+          <Player
+            accessToken={accessToken}
+            trackUri={playingTrack?.uri ? playingTrack?.uri : playingTrack}
+          />
+        </footer>
+      ) : null}
     </section>
   );
 }
