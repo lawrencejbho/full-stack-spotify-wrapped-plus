@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import Layout from "./pages/Layout";
 import "./index.css";
 import * as dotenv from "dotenv";
 
@@ -17,7 +17,7 @@ function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        {!code ? <Login /> : <Dashboard code={code} />}
+        {!code ? <Login /> : <Layout code={code} />}
       </QueryClientProvider>
     </>
   );
