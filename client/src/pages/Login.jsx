@@ -4,11 +4,11 @@ import PrivacyModal from "../components/PrivacyModal.jsx";
 
 import Hero from "../assets/wp.png";
 
-const AUTH_URL =
-  "https://accounts.spotify.com/authorize?client_id=42d4174a9b25462c83b89191088e7abf&response_type=code&redirect_uri=http://localhost:5173&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read%20user-read-recently-played";
-
 // const AUTH_URL =
-//   "https://accounts.spotify.com/authorize?client_id=501daf7d1dfb43a291ccc64c91c8a4c8&response_type=code&redirect_uri=https://wrappedplus.com&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read%20user-read-recently-played";
+//   "https://accounts.spotify.com/authorize?client_id=42d4174a9b25462c83b89191088e7abf&response_type=code&redirect_uri=http://localhost:5173&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read%20user-read-recently-played";
+
+const AUTH_URL =
+  "https://accounts.spotify.com/authorize?client_id=501daf7d1dfb43a291ccc64c91c8a4c8&response_type=code&redirect_uri=https://wrappedplus.com&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state%20user-top-read%20user-read-recently-played";
 
 export default function Login() {
   return (
