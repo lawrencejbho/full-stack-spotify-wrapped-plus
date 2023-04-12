@@ -127,7 +127,7 @@ async function getArtists(req, res) {
         "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3",
         [userId, duration, getCurrentDate()]
       );
-      console.log(query.rows);
+      // console.log(query.rows);
 
       res.json(query.rows);
       await client.set(redisKey, JSON.stringify(query.rows), {
@@ -343,7 +343,7 @@ async function getListeningHistory(req, res) {
       userId: userId,
     });
     const cacheResults = await client.get(redisKey);
-    if (cacheResults) {
+    if (cacheResults && cacheResults.length !== 0) {
       const obj = JSON.parse(cacheResults);
       res.json(obj);
     } else {
@@ -498,7 +498,7 @@ async function addRecentTracks(req, res) {
       if (query.rows.length == 0) {
         for (let i = recent_tracks.length - 1; i >= 0; i--) {
           if (recent_tracks[i].date.slice(0, 10) == date) {
-            console.log(i);
+            // console.log(i);
             updateArray.push(recent_tracks[i]);
           }
         }
