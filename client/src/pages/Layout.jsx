@@ -8,6 +8,7 @@ import {
   useQueryClient,
   QueryClient,
   QueryClientProvider,
+  useMutation,
 } from "@tanstack/react-query";
 
 import useAuth from "../hooks/useAuth.jsx";
@@ -100,6 +101,39 @@ export default function Dashboard({ code }) {
     refetchOnReconnect: false,
     retry: false,
   });
+
+  // const createArtistsMutationShort = useMutation({
+  //   mutationFn: createArtistsMutation("short_term"),
+  // });
+  // const createArtistsMutationMedium = useMutation({
+  //   mutationFn: createArtistsMutation("medium_term"),
+  // });
+  // const createArtistsMutationLong = useMutation({
+  //   mutationFn: createArtistsMutation("long_term"),
+  // });
+
+  // function createArtistsMutation(duration) {
+  //   if (topArtists.length < 1) return;
+  //   let artists_array = topArtists.map((entry) => entry.name);
+  //   let genres_array = topArtists.map((entry) => entry.genres);
+  //   let albums_array = topArtists.map((entry) => entry.albumUrl);
+  //   // console.log(albums_array);
+
+  //   axios
+  //     .post("/api/artists", {
+  //       params: {
+  //         artists: artists_array,
+  //         genres: genres_array,
+  //         albums: albums_array,
+  //         duration: duration,
+  //         userId: userId,
+  //       },
+  //     })
+  //     .then((data) => {
+  //       // console.log(data);
+  //       setLoading(false);
+  //     });
+  // }
 
   const getTracksQueryShort = useQuery({
     queryKey: ["tracks_short"],
