@@ -41,38 +41,6 @@ export default function TopArtist({ accessToken, title }) {
         }
       });
 
-    // spotifyApi.getMyTopArtists({ time_range: timeSelect }).then((data) => {
-    //   // console.log(data.body.items);
-    //   setTopArtists(
-    //     data.body.items.map((artist) => {
-    //       // albums images aren't guaranteed to be ordered by size so use reduce
-    //       const smallestArtistImage = artist.images.reduce(
-    //         (smallest, image) => {
-    //           if (image.height < smallest.height) return image;
-    //           return smallest;
-    //         },
-    //         artist.images[0]
-    //       );
-    //       let genreString = "";
-    //       const firstThreeGenres = artist.genres.forEach((genre, index) => {
-    //         if (index < 3) {
-    //           genreString += `${genre}, `;
-    //         }
-    //       });
-    //       genreString = genreString.substring(0, genreString.length - 2);
-    //       // this will capitalize each word
-    //       genreString = genreString.replace(/(^\w{1})|(\s+\w{1})/g, (letter) =>
-    //         letter.toUpperCase()
-    //       );
-    //       return {
-    //         name: artist.name,
-    //         genres: genreString,
-    //         albumUrl: smallestArtistImage.url,
-    //       };
-    //     })
-    //   );
-    // });
-
     axios
       .get("/api/artists", {
         params: {

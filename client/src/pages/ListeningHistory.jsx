@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import SpotifyWebApi from "spotify-web-api-node";
+import { DateTime } from "luxon";
+
 import TrackEntry from "../components/TrackEntry.jsx";
 import ListeningHistoryChart from "../components/ListeningHistoryChart.jsx";
 
@@ -74,7 +76,7 @@ export default function ListeningHistory({ accessToken, title }) {
     let recent_array = recent.map((entry) => {
       return {
         duration: entry.duration,
-        date: entry.date,
+        date: convertTimestampPST(entry.date),
       };
     });
     // console.log(recent_array);
@@ -105,6 +107,14 @@ export default function ListeningHistory({ accessToken, title }) {
           });
       });
   }, [recent]);
+
+  function convertTimestampPST(date) {
+    const currentDate = DateTime.fromISO(date)
+      .setZone("America/Los_Angeles")
+      .toString();
+
+    return currentDate.slice(0, currentDate.length - 6);
+  }
 
   // useEffect(() => {
   //   if (!location.accessToken) return;

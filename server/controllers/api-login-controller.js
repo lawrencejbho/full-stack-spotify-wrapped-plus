@@ -45,6 +45,13 @@ async function test2(req, res) {
   }
 }
 
+function getSpotifyInfo(req, res) {
+  res.json({
+    clientId: process.env.SPOTIFY_CLIENT_ID,
+    redirect: process.env.REDIRECT_URI,
+  });
+}
+
 function refreshAccess(req, res) {
   //   console.log(req);
   const refreshToken = req.body.refreshToken;
@@ -279,7 +286,6 @@ async function getTracksRankChange(req, res) {
 
 async function getGenres(req, res) {
   const { userId, duration } = req.query;
-
   try {
     const redisKey = JSON.stringify({
       url: req.url,
@@ -298,7 +304,7 @@ async function getGenres(req, res) {
         "SELECT * FROM genres WHERE user_id = $1 AND duration = $2 AND created_at = $3",
         [userId, duration, getCurrentDate()]
       );
-      // console.log(query.rows[0]);
+      // console.log(query);
       res.json(query.rows[0]);
       await client.set(redisKey, JSON.stringify(query.rows[0]), {
         EX: 7200,
@@ -450,8 +456,8 @@ async function createArtists(req, res) {
   // insert into genres table
   try {
     const saveToDatabase = await pool.query(
-      "INSERT INTO genres(genres, user_id, duration) VALUES ($1, $2, $3) RETURNING *",
-      [topGenres, userId, duration]
+      "INSERT INTO genres(genres, user_id, duration, created_at) VALUES ($1, $2, $3, $4) RETURNING *",
+      [topGenres, userId, duration, getCurrentDate()]
     );
     res.sendStatus(200);
   } catch (err) {
@@ -463,7 +469,8 @@ async function addRecentTracks(req, res) {
   const { recent_tracks, userId } = req.body.params;
   let todayUpdate = [];
   let yesterdayUpdate = [];
-  let currentDate = new Date().toISOString().split("T")[0];
+
+  console.log(recent_tracks);
 
   try {
     // this will grab the newest database entry
@@ -518,7 +525,7 @@ async function addRecentTracks(req, res) {
       for (let i = recent_tracks.length - 1; i >= 0; i--) {
         if (recent_tracks[i].date.slice(0, 10) == latestDate) {
           if (convertToTimestamp(recent_tracks[i].date) > latestTimestamp) {
-            // console.log(recent_tracks[i]);
+            console.log(recent_tracks[i]);
             updateArray.push(recent_tracks[i]);
           }
         }
@@ -605,9 +612,12 @@ function sortTopGenres(genres_array) {
 
   // get the top 10 and reverse the order
 
-  const topTen = genresSorted
-    .slice(genresSorted.length - 10, genresSorted.length)
-    .reverse();
+  let minLength = 0;
+  if (genresSorted.length > 10) {
+    minLength = genresSorted.length - 10;
+  }
+
+  const topTen = genresSorted.slice(minLength, genresSorted.length).reverse();
 
   return topTen;
 }
@@ -650,6 +660,7 @@ function getYesterdayDate() {
   return formattedDate;
 }
 
+exports.getSpotifyInfo = getSpotifyInfo;
 exports.refreshAccess = refreshAccess;
 exports.loginSpotify = loginSpotify;
 exports.getLyrics = getLyrics;

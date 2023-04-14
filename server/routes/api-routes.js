@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.get("/test2", apiLoginController.test2);
 
+router.get("/spotify-info", apiLoginController.getSpotifyInfo);
+
 router.post("/refresh", apiLoginController.refreshAccess);
 
 router.post("/login", apiLoginController.loginSpotify);

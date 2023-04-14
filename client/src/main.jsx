@@ -8,6 +8,7 @@ import TopTrack from "./pages/TopTrack.jsx";
 import TopArtist from "./pages/TopArtist.jsx";
 import TopGenres from "./pages/TopGenres.jsx";
 import ListeningHistory from "./pages/ListeningHistory.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "listening-history",
         element: <ListeningHistory title="Listening History | Wrapped Plus" />,
+      },
+      {
+        path: "dashboard",
+        element: <Dashboard title="Dashboard | Wrapped Plus" />,
       },
     ],
   },
