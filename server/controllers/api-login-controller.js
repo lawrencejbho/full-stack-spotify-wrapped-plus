@@ -339,6 +339,71 @@ async function getTimeListenedToday(req, res) {
   }
 }
 
+async function updateListeningHistory(req, res) {
+  const { userId } = req.query;
+
+  try {
+    // first check if listening history is already there
+    const listeningHistoryQuery = await pool.query(
+      "SELECT FROM listening_history WHERE user_id = $1 AND created_at = $2",
+      [userId, getYesterdayDate()]
+    );
+
+    // console.log(listeningHistoryQuery.rows);
+
+    if (listeningHistoryQuery.rows.length == 0) {
+      // go through yesterday's tracks and figure out what the final number is then add it to listening history database
+      // console.log("listening history");
+
+      const recentTracksQuery = await pool.query(
+        "SELECT tracks FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
+        [userId, getYesterdayDate()]
+      );
+
+      const recentTracksQuery2 = await pool.query(
+        "SELECT tracks FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
+        [userId, getCurrentDate()]
+      );
+
+      let total = 0;
+      if (recentTracksQuery.rows.length > 0) {
+        recentTracksQuery.rows.forEach((row) => {
+          row.tracks.forEach((track) => {
+            let obj = JSON.parse(track);
+            total += obj.duration;
+          });
+        });
+      }
+
+      async function updateDatabase(duration, date) {
+        const updateQuery = await pool.query(
+          "INSERT INTO listening_history(duration,user_id, calendar_date) VALUES ($1, $2, $3) RETURNING *",
+          [duration, userId, date]
+        );
+      }
+
+      async function deleteYesterdayEntries(date) {
+        const deleteQuery = await pool.query(
+          "DELETE FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
+          [userId, date]
+        );
+      }
+      getYesterdayDate();
+
+      if (total > 0) {
+        console.log(total);
+        updateDatabase(total, getYesterdayDate());
+        deleteYesterdayEntries(getYesterdayDate());
+        console.log("deleted tracks");
+      }
+    }
+  } catch (error) {
+    console.log(error.message);
+  } finally {
+    res.sendStatus(200);
+  }
+}
+
 async function getListeningHistory(req, res) {
   const { userId } = req.query;
 
@@ -363,55 +428,6 @@ async function getListeningHistory(req, res) {
 
       res.json(listeningHistoryQuery.rows);
 
-      // even if we send a res, we can now
-      // go through yesterday's tracks and figure out what the final number is then add it to listening history database
-
-      // console.log("listening history");
-
-      const recentTracksQuery = await pool.query(
-        "SELECT tracks FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
-        [userId, getYesterdayDate()]
-      );
-
-      const recentTracksQuery2 = await pool.query(
-        "SELECT tracks FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
-        [userId, getCurrentDate()]
-      );
-
-      // console.log(recentTracksQuery2);
-
-      // console.log(query.rows);
-      let total = 0;
-      if (recentTracksQuery.rows.length > 0) {
-        recentTracksQuery.rows.forEach((row) => {
-          row.tracks.forEach((track) => {
-            let obj = JSON.parse(track);
-            total += obj.duration;
-          });
-        });
-      }
-
-      async function updateDatabase(duration, date) {
-        const updateQuery = await pool.query(
-          "INSERT INTO listening_history(duration,user_id, calendar_date) VALUES ($1, $2, $3) RETURNING *",
-          [duration, userId, date]
-        );
-      }
-
-      async function deleteYesterdayEntries(date) {
-        const deleteQuery = await pool.query(
-          "DELETE FROM recent_tracks WHERE user_id = $1 AND calendar_date = $2",
-          [userId, date]
-        );
-      }
-
-      if (total > 0) {
-        // console.log(total);
-        updateDatabase(total, getYesterdayDate());
-        deleteYesterdayEntries(getYesterdayDate());
-        // console.log("deleted tracks");
-      }
-
       await client.set(redisKey, JSON.stringify(listeningHistoryQuery.rows), {
         EX: 7200,
       });
@@ -424,7 +440,6 @@ async function getListeningHistory(req, res) {
 async function createArtists(req, res) {
   const { artists, genres, albums, duration, userId } = req.body.params;
   let topGenres = [];
-  const currentDate = new Date().toISOString().split("T")[0];
 
   // check if the entry already exists for the specific duration
   try {
@@ -670,6 +685,8 @@ exports.getTracksRankChange = getTracksRankChange;
 
 exports.getGenres = getGenres;
 exports.getListeningHistory = getListeningHistory;
+
+exports.updateListeningHistory = updateListeningHistory;
 
 exports.addArtists = createArtists;
 exports.addRecentTracks = addRecentTracks;

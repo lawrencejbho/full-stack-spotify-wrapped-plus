@@ -11,6 +11,8 @@ import {
   useMutation,
 } from "@tanstack/react-query";
 
+import { DateTime } from "luxon";
+
 import useAuth from "../hooks/useAuth.jsx";
 import Player from "../components/Player.jsx";
 import SpotifyWebApi from "spotify-web-api-node";
@@ -39,6 +41,7 @@ export default function Dashboard({ code }) {
 
   const [topArtists, setTopArtists] = useState([]);
   const [topTracks, setTopTracks] = useState([]);
+  const [recentTracks, setRecentTracks] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -168,6 +171,61 @@ export default function Dashboard({ code }) {
     retry: false,
   });
 
+  const getRecentTracksQuery = useQuery({
+    queryKey: ["recent_tracks"],
+    queryFn: getRecentTracks,
+    enabled: userId !== "",
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+    refetchOnmount: false,
+    refetchOnReconnect: false,
+    retry: false,
+  });
+
+  function getRecentTracks() {
+    axios
+      .get("https://api.spotify.com/v1/me/player/recently-played", {
+        params: {
+          limit: 50,
+          access_token: accessToken,
+        },
+      })
+      .then((res) => {
+        // console.log(res);
+        setRecentTracks(
+          res?.data?.items?.map((item) => {
+            const smallestAlbumImage = item.track.album.images.reduce(
+              (smallest, image) => {
+                if (image.height < smallest.height) return image;
+                return smallest;
+              },
+              item.track.album.images[0]
+            );
+            let artists_string = "";
+            item.track.artists.forEach((artist, index) => {
+              if (index + 1 == item.track.artists.length) {
+                return (artists_string += `${artist.name}`);
+              } else {
+                return (artists_string += `${artist.name}, `);
+              }
+            });
+
+            return {
+              artist: artists_string,
+              name: item.track.name,
+              uri: item.track.uri,
+              albumUrl: smallestAlbumImage.url,
+              duration: item.track.duration_ms,
+              date: item.played_at,
+            };
+          })
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   function queryArtists(duration) {
     spotifyApi.getMyTopArtists({ time_range: duration }).then((data) => {
       setTopArtists(
@@ -209,7 +267,6 @@ export default function Dashboard({ code }) {
     let artists_array = topArtists.map((entry) => entry.name);
     let genres_array = topArtists.map((entry) => entry.genres);
     let albums_array = topArtists.map((entry) => entry.albumUrl);
-    // console.log(albums_array);
 
     axios
       .post("/api/artists", {
@@ -261,6 +318,40 @@ export default function Dashboard({ code }) {
 
     return topTracks;
   }
+
+  useEffect(() => {
+    function convertTimestampPST(date) {
+      const currentDate = DateTime.fromISO(date)
+        .setZone("America/Los_Angeles")
+        .toString();
+
+      return currentDate.slice(0, currentDate.length - 6);
+    }
+
+    if (recentTracks.length < 1) return;
+    let recent_array = recentTracks.map((entry) => {
+      return {
+        duration: entry.duration,
+        date: convertTimestampPST(entry.date),
+      };
+    });
+    // console.log(recent_array);
+
+    axios
+      .post("/api/recent-tracks", {
+        params: {
+          recent_tracks: recent_array,
+          userId: userId,
+        },
+      })
+      .then((response) => {
+        return axios.get("/api/update-listening-history", {
+          params: {
+            userId: userId,
+          },
+        });
+      });
+  }, [recentTracks]);
 
   useEffect(() => {
     if (topTracks.length < 1) return;
