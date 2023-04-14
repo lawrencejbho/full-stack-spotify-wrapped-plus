@@ -470,8 +470,6 @@ async function addRecentTracks(req, res) {
   let todayUpdate = [];
   let yesterdayUpdate = [];
 
-  console.log(recent_tracks);
-
   try {
     // this will grab the newest database entry
     const query = await pool.query(

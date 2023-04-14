@@ -83,7 +83,7 @@ export default function Dashboard({ code }) {
   const getArtistsQueryMedium = useQuery({
     queryKey: ["artists_medium"],
     queryFn: () => queryArtists("medium_term"),
-    enabled: userId !== "",
+    enabled: topArtists.length > 0,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     refetchOnmount: false,
@@ -149,7 +149,7 @@ export default function Dashboard({ code }) {
   const getTracksQueryMedium = useQuery({
     queryKey: ["tracks_medium"],
     queryFn: () => queryTracks("medium_term"),
-    enabled: userId !== "",
+    enabled: topTracks.length > 0,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     refetchOnmount: false,
