@@ -5,7 +5,12 @@ import axios from "axios";
 import DashboardContainer from "../components/DashboardContainer";
 import TimeSelectNav from "../components/TimeSelectNav";
 
+import SpotifyWebApi from "spotify-web-api-node";
+
 export default function Dashboard(accessToken, title) {
+  const spotifyApi = new SpotifyWebApi({
+    clientId: "501daf7d1dfb43a291ccc64c91c8a4c8",
+  });
   const location = useOutletContext();
 
   const [timeSelect, setTimeSelect] = useState("short_term");
@@ -48,6 +53,27 @@ export default function Dashboard(accessToken, title) {
       });
   }, [location.userId, timeSelect]);
 
+  useEffect(() => {
+    if (!location.accessToken) return;
+    spotifyApi.setAccessToken(location.accessToken);
+  }, [location.accessToken]);
+
+  useEffect(() => {
+    spotifyApi.searchArtists("Mitis").then((data) => {
+      console.log(data);
+    });
+    spotifyApi
+      .getArtistRelatedArtists("16yUpGkBRgc2eDMd3bB3Uw")
+      .then((data) => {
+        console.log(data);
+      });
+    spotifyApi
+      .getArtistTopTracks("16yUpGkBRgc2eDMd3bB3Uw", "US")
+      .then((data) => {
+        console.log(data);
+      });
+  }, []);
+
   function changeTime(duration) {
     setTimeSelect(duration);
   }
@@ -56,8 +82,6 @@ export default function Dashboard(accessToken, title) {
     document.title = title;
   }, []);
 
-  console.log(topArtists);
-
   return (
     <div className="overflow-x-hidden">
       {topGenres.length > 0 ? (
@@ -65,9 +89,8 @@ export default function Dashboard(accessToken, title) {
       ) : null}
       <div className="mt-4 ml-4">
         <div className="font-bold mb-2">Top Artists</div>
-        {topArtists.artists.length > 0
+        {topArtists?.artists?.length > 0
           ? topArtists.artists.slice(0, 5).map((entry) => {
-              console.log(entry);
               return <DashboardContainer data={entry} />;
             })
           : null}
@@ -75,7 +98,7 @@ export default function Dashboard(accessToken, title) {
 
       <div className="mt-4 ml-4">
         <div className="font-bold mb-2">Top Tracks</div>
-        {topTracks.tracks.length > 0
+        {topTracks?.tracks?.length > 0
           ? topTracks.tracks.slice(0, 5).map((entry) => {
               return <DashboardContainer data={entry} />;
             })

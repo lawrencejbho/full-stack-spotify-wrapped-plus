@@ -13,14 +13,14 @@ export default function Sidebar({ page, accessToken, handleClick }) {
     <div className="inline-block ">
       <div className=" flex w-16 h-full sm:w-36 ">
         <aside className="flex w-16 sm:w-36 flex-col space-y-2 border-r-2 border-gray-200 bg-white p-2">
-          {/* <SidebarItem
+          <SidebarItem
             image={DashboardImg}
             handleClick={handleClick}
             pathname="dashboard"
             accessToken={accessToken}
             display="Dashboard"
             page={page}
-          /> */}
+          />
           <SidebarItem
             image={StarImg}
             handleClick={handleClick}

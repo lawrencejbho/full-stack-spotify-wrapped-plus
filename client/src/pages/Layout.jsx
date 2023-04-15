@@ -224,6 +224,7 @@ export default function Dashboard({ code }) {
       .catch((error) => {
         console.log(error);
       });
+    return recentTracks;
   }
 
   function queryArtists(duration) {
