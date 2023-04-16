@@ -91,7 +91,7 @@ export default function Dashboard(accessToken, title) {
         <div className="font-bold mb-2">Top Artists</div>
         {topArtists?.artists?.length > 0
           ? topArtists.artists.slice(0, 5).map((entry) => {
-              return <DashboardContainer data={entry} />;
+              return <DashboardContainer data={JSON.parse(entry).name} />;
             })
           : null}
       </div>

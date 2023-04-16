@@ -134,7 +134,7 @@ async function getArtists(req, res) {
         "SELECT * FROM artists WHERE user_id = $1 AND duration = $2 AND created_at = $3",
         [userId, duration, getCurrentDate()]
       );
-      // console.log(query.rows);
+      console.log(query.rows);
 
       res.json(query.rows);
       await client.set(redisKey, JSON.stringify(query.rows), {
@@ -170,17 +170,17 @@ async function getArtistsRankChange(req, res) {
       // console.log(query.rows);
       if (query.rows.length > 1) {
         let map = new Map();
-        for (let i = 0; i < query.rows[1].artists.length; i++) {
+        for (let i = 0; i < query.rows[1].artists.name.length; i++) {
           map.set(query.rows[1].artists[i], i + 1);
         }
         // console.log(map);
 
         let changeArray = query.rows[0].artists.map((artist, index) => {
-          if (map.has(artist) == false) {
+          if (map.has(artist.name) == false) {
             return "new";
-          } else if (map.get(artist) > index + 1) {
+          } else if (map.get(artist.name) > index + 1) {
             return "higher";
-          } else if (map.get(artist) < index + 1) {
+          } else if (map.get(artist.name) < index + 1) {
             return "lower";
           } else {
             return "same";

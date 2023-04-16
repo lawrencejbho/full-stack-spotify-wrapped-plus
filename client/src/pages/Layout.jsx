@@ -256,6 +256,7 @@ export default function Dashboard({ code }) {
             name: artist.name,
             genres: genreString,
             albumUrl: smallestArtistImage.url,
+            id: artist.id,
           };
         })
       );
@@ -265,7 +266,10 @@ export default function Dashboard({ code }) {
 
   useEffect(() => {
     if (topArtists.length < 1) return;
-    let artists_array = topArtists.map((entry) => entry.name);
+    let artists_array = topArtists.map((entry) => ({
+      name: entry.name,
+      id: entry.id,
+    }));
     let genres_array = topArtists.map((entry) => entry.genres);
     let albums_array = topArtists.map((entry) => entry.albumUrl);
 
