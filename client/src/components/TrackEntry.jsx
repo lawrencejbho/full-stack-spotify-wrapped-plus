@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
 import { GoPrimitiveDot } from "react-icons/go";
+import { BsPlayFill } from "react-icons/bs";
 
 export default function Top({
   name,
@@ -12,6 +13,7 @@ export default function Top({
   index,
   tracksChange,
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   function handlePlay() {
     chooseTrack(track);
   }
@@ -27,15 +29,16 @@ export default function Top({
       return <GoPrimitiveDot className="text-blue-500" />;
     }
   }
-
   return (
     <div
       onClick={handlePlay}
-      className="flex pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6  hover:bg-gray-100"
+      className="flex cursor-pointer pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6  hover:bg-gray-100"
       key={index}
+      onMouseOver={() => setIsHovered(true)}
+      onMouseOut={() => setIsHovered(false)}
     >
       <div className="flex flex-col justify-center items-center min-w-[20px]">
-        {index}
+        {isHovered ? <BsPlayFill className="text-xl" /> : index}
         {displayIcon()}
       </div>
       <img

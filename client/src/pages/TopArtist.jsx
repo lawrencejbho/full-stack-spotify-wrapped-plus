@@ -17,6 +17,7 @@ export default function TopArtist({ accessToken, title }) {
 
   const [artistId, setArtistId] = useState("");
   const [artistTopTracks, setArtistTopTracks] = useState([]);
+  const [relatedArtists, setRelatedArtists] = useState([]);
 
   const [artistsChange, setArtistsChange] = useState([]);
 
@@ -58,15 +59,44 @@ export default function TopArtist({ accessToken, title }) {
   }, [location.userId, timeSelect]);
 
   useEffect(() => {
-    // spotifyApi
-    //   .getArtistRelatedArtists("16yUpGkBRgc2eDMd3bB3Uw")
-    //   .then((data) => {
-    //     console.log(data);
-    //   });
     if (artistId == "") {
       setArtistTopTracks([]);
+      setRelatedArtists([]);
       return;
     }
+
+    spotifyApi.getArtistRelatedArtists(artistId).then((data) => {
+      setRelatedArtists(
+        // console.log(data.body.items);
+        data.body.artists.slice(0, 5).map((artist) => {
+          // albums images aren't guaranteed to be ordered by size so use reduce
+          const smallestArtistImage = artist.images.reduce(
+            (smallest, image) => {
+              if (image.height < smallest.height) return image;
+              return smallest;
+            },
+            artist.images[0]
+          );
+          let genreString = "";
+          const firstThreeGenres = artist.genres.forEach((genre, index) => {
+            if (index < 3) {
+              genreString += `${genre}, `;
+            }
+          });
+          genreString = genreString.substring(0, genreString.length - 2);
+          // this will capitalize each word
+          genreString = genreString.replace(/(^\w{1})|(\s+\w{1})/g, (letter) =>
+            letter.toUpperCase()
+          );
+          return {
+            name: artist.name,
+            genres: genreString,
+            artistImage: smallestArtistImage.url,
+            id: artist.id,
+          };
+        })
+      );
+    });
     spotifyApi.getArtistTopTracks(artistId, "US").then((data) => {
       // console.log(data.body.tracks);
       setArtistTopTracks(
@@ -111,15 +141,6 @@ export default function TopArtist({ accessToken, title }) {
     }
   }
 
-  // function styles(id) {
-  //   if (id == artistId) {
-  //     console.log("hitting");
-  //     return {
-  //       backgroundColor: "blue",
-  //     };
-  //   }
-  // }
-
   useEffect(() => {
     document.title = title;
   }, []);
@@ -148,6 +169,7 @@ export default function TopArtist({ accessToken, title }) {
                 // style={{ backgroundColor: id == artistId ? "blue" : "red" }}
                 chooseTrack={location.chooseTrack}
                 topTracks={id == artistId ? artistTopTracks : null}
+                relatedArtists={id == artistId ? relatedArtists : null}
               />
             );
           })}

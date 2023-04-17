@@ -60,17 +60,17 @@ export default function Dashboard(accessToken, title) {
 
   useEffect(() => {
     spotifyApi.searchArtists("Mitis").then((data) => {
-      console.log(data);
+      // console.log(data);
     });
     spotifyApi
       .getArtistRelatedArtists("16yUpGkBRgc2eDMd3bB3Uw")
       .then((data) => {
-        console.log(data);
+        // console.log(data);
       });
     spotifyApi
       .getArtistTopTracks("16yUpGkBRgc2eDMd3bB3Uw", "US")
       .then((data) => {
-        console.log(data);
+        // console.log(data);
       });
   }, []);
 

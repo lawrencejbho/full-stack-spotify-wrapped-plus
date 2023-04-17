@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
+
+import { BsPlayFill } from "react-icons/bs";
 
 export default function TrackSearchResults({
   track,
@@ -12,14 +14,18 @@ export default function TrackSearchResults({
     clearSearch({ artists: track.artists, title: track.title });
   }
 
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       className=" flex pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6 hover:bg-gray-100 cursor-pointer w-full"
       key={index}
       onClick={handlePlay}
+      onMouseOver={() => setIsHovered(true)}
+      onMouseOut={() => setIsHovered(false)}
     >
       <div className="flex justify-center items-center min-w-[20px]">
-        {index}
+        {isHovered ? <BsPlayFill className="text-xl" /> : index}
       </div>
       <img
         src={track.albumUrl}
