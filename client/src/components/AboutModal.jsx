@@ -58,12 +58,19 @@ export default function modal() {
                   </Dialog.Title>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500 font-Rubik">
-                      Wrapped Plus allows you to sign in with your Spotify
-                      account to view your top Artists, Songs, and Genres. You
-                      can search for new songs or play your favorites directly
-                      in the built in web player that will also show the lyrics.
-                      Unique charts and graph allow you to interact with your
+                      Wrapped Plus allows users to log in with their Spotify
+                      account to view their favorite Artists, Songs, and Genres.
+                      Users can search for new songs or play their favorites in
+                      the built in web player which will also show the song's
+                      lyrics. Users can also view their recently played songs
+                      and their listening history by logging in daily. Charts
+                      and graph allow users a unique way to interact with their
                       personalized listening information.
+                      <br />
+                      <br />
+                      Please email lawrence.jb.ho@gmail in order to gain access
+                      to the app as Spotify Developer requires a defined allow
+                      list for users.
                       <br />
                       <br />
                       Made by{" "}
