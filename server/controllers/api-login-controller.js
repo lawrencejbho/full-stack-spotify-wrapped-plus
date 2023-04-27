@@ -16,7 +16,9 @@ let client;
   client = redis.createClient({
     url,
     password: process.env.REDIS_PASSWORD,
+    // password: "password"
   });
+
 
   client.on("error", (err) => console.log("Redis Client Error", err));
 

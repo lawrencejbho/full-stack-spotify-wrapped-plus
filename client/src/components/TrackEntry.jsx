@@ -38,7 +38,7 @@ export default function Top({
       onMouseOut={() => setIsHovered(false)}
     >
       <div className="flex flex-col justify-center items-center min-w-[20px]">
-        {isHovered ? <BsPlayFill className="text-xl" /> : index}
+        {isHovered ? <BsPlayFill className="text-xl h-6" /> : index}
         {displayIcon()}
       </div>
       <img

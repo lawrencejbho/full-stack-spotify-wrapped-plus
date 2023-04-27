@@ -12,11 +12,11 @@ export default function RelatedArtistsDropdown({
 
   return (
     <div
-      className="w-screen flex pl-2 sm:pl-4 py-2 space-x-2 sm:space-x-6 hover:bg-gray-100 cursor-pointer"
+      className=" flex sm:pl-4 py-2 space-x-2 sm:space-x-6 hover:bg-gray-100 cursor-pointer"
       key={index}
       // style={styles()}
     >
-      <div className="pl-16 flex flex-col justify-center items-center min-w-[20px]">
+      <div className="pl-16 flex flex-col justify-center items-center min-w-[20px] w-4">
         {index}
       </div>
       <img

@@ -174,7 +174,7 @@ export default function ArtistEntry({
         </div>
         {isHovered ? (
           <button
-            className="z-10 w-24 bg-slate-400"
+            className="z-10 w-32  rounded-xl hover:bg-slate-300"
             onClick={clickDisplayTopTracks}
           >
             Popular Songs
@@ -183,7 +183,7 @@ export default function ArtistEntry({
 
         {isHovered ? (
           <button
-            className="z-10 w-24 bg-slate-400"
+            className="z-10 w-32 hover:bg-slate-300 rounded-xl"
             onClick={clickDisplayRelatedArtists}
           >
             Related Artists
