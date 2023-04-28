@@ -232,9 +232,11 @@ export default function Dashboard({ code }) {
       // console.log(data.body.items.length)
       // there is an issue with spotify's API for short term artists, so need to run this check to make sure the response has length 20 
       // otherwise, it will refetch our query  
-      if (duration == "short_term" && data.body.items.length < 20 ) { 
-        getArtistsQueryShort.refetch()
-        return
+      if (data.body.items.length < 20 ) { 
+        if (duration == "short_term") getArtistsQueryShort.refetch()
+        if (duration == "medium_term") getArtistsQueryMedium.refetch()
+        if (duration == "long_term") getArtistsQueryLong.refetch()
+        return 
     }
       setTopArtists(
         data.body.items.map((artist) => {

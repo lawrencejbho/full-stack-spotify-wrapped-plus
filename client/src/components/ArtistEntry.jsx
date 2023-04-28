@@ -53,7 +53,6 @@ export default function ArtistEntry({
   }
 
   const handleClick = () => {
-    console.log("hit");
     if (!dropdownOpen) {
       changeId(id);
       setDropdownOpen(true);
@@ -81,7 +80,6 @@ export default function ArtistEntry({
         setDropdownOpen(false);
         setDisplayRelatedArtists(false);
       } else {
-        console.log("hitt");
         setDisplayRelatedArtists(true);
       }
     } else {
