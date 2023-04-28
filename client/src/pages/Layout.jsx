@@ -97,7 +97,7 @@ export default function Dashboard({ code }) {
   const getArtistsQueryLong = useQuery({
     queryKey: ["artists_long"],
     queryFn: () => queryArtists("long_term"),
-    enabled: userId !== "",
+    enabled: loading === false,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     refetchOnmount: false,
@@ -229,8 +229,14 @@ export default function Dashboard({ code }) {
 
   function queryArtists(duration) {
     spotifyApi.getMyTopArtists({ time_range: duration }).then((data) => {
+      // console.log(data.body.items.length)
+      // there is an issue with spotify's API for short term artists, so need to run this check to make sure the response has length 20 
+      // otherwise, it will refetch our query  
+      if (duration == "short_term" && data.body.items.length < 20 ) { 
+        getArtistsQueryShort.refetch()
+        return
+    }
       setTopArtists(
-        // console.log(data.body.items);
         data.body.items.map((artist) => {
           // albums images aren't guaranteed to be ordered by size so use reduce
           const smallestArtistImage = artist.images.reduce(
