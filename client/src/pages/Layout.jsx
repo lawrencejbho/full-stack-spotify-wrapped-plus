@@ -197,14 +197,19 @@ export default function Dashboard({ code }) {
   function queryArtists(duration) {
     spotifyApi.getMyTopArtists({ time_range: duration }).then((data) => {
       // console.log(data.body.items.length)
-      // there is an issue with spotify's API for short term artists, so need to run this check to make sure the response has length 20 
-      // otherwise, it will refetch our query  
-      if (data.body.items.length < 18 ) { 
-        if (duration == "short_term") getArtistsQueryShort.refetch()
-        if (duration == "medium_term") getArtistsQueryMedium.refetch()
-        if (duration == "long_term") getArtistsQueryLong.refetch()
-        return 
-    }
+
+      /* there is an issue with spotify's API for short term artists, so need to run this check to make sure the response has length 20
+       otherwise, it will refetch our query
+       the number 13 is extremely variable unfortunately, factors including Spotify or the user's own listening habits
+       I think the proper way of writing this would be to store the item in state and if keep getting the same number
+       then we'll go with the response */
+
+      if (data.body.items.length < 13) {
+        if (duration == "short_term") getArtistsQueryShort.refetch();
+        if (duration == "medium_term") getArtistsQueryMedium.refetch();
+        if (duration == "long_term") getArtistsQueryLong.refetch();
+        return;
+      }
       setTopArtists(
         data.body.items.map((artist) => {
           // albums images aren't guaranteed to be ordered by size so use reduce
